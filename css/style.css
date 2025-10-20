@@ -1,0 +1,382 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(135deg, #1e0f30 0%, #311b92 100%);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    letter-spacing: 1px;
+    line-height: 1.5;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Game Container */
+#game-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Main Menu */
+.screen {
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #ffd43b;
+    -webkit-text-stroke: 2px #e67700;
+    position: relative;
+    animation: titleFloat 3s ease-in-out infinite;
+}
+
+h1::before {
+    content: attr(data-text);
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    color: #ffe066;
+    -webkit-text-stroke: 0;
+    animation: glitch 5s infinite linear alternate-reverse;
+}
+
+h1::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    color: #ff922b;
+    -webkit-text-stroke: 0;
+    animation: glitch 4s infinite linear alternate;
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+.menu-button {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 15px 30px;
+    font-size: 1em;
+    background: #ff6b6b;
+    border: 4px solid #fff;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Press Start 2P', cursive;
+    text-transform: uppercase;
+    box-shadow: 0 6px 0 #c92a2a, 0 8px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    top: 0;
+}
+
+.menu-button:hover {
+    background: #fa5252;
+    transform: translateY(2px);
+    box-shadow: 0 4px 0 #c92a2a, 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.menu-button:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #c92a2a, 0 0 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Instructions Screen */
+#instructions-screen {
+    color: #ffd43b;
+    text-align: center;
+    padding: 20px;
+}
+
+#instructions-screen h2 {
+    font-size: 1.8em;
+    margin-bottom: 30px;
+    text-shadow: 3px 3px 0 #000;
+    color: #ffd43b;
+}
+
+.instructions-content {
+    background: rgba(0, 0, 0, 0.7);
+    border: 3px solid #ffd43b;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    text-align: left;
+}
+
+.instructions-content h3 {
+    color: #74b9ff;
+    font-size: 1em;
+    margin: 15px 0;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.instructions-content p {
+    font-size: 0.7em;
+    margin: 10px 0;
+    line-height: 1.6;
+    color: #fff;
+}
+
+.control-section, .gameplay-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+/* Back Button */
+.back-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: #ff6b6b;
+    border: 3px solid #fff;
+    border-radius: 10px;
+    color: white;
+    font-size: 1.2em;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P', cursive;
+    box-shadow: 0 4px 0 #c92a2a, 0 6px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    padding-bottom: 4px; /* Better center the arrow visually */
+}
+
+.back-button:hover {
+    background: #fa5252;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #c92a2a, 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.menu-button:hover {
+    background: white;
+    color: black;
+    transform: scale(1.05);
+}
+
+/* Game Canvas */
+#gameCanvas {
+    border: 4px solid #ffd43b;
+    background: #212529;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(255, 212, 59, 0.3);
+}
+
+/* Game UI */
+#game-ui {
+    position: absolute;
+    top: 20px;
+    left: 90px; /* Moved right to make room for back button */
+    font-size: 0.8em;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+    z-index: 900;
+}
+
+#stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 200px;
+    margin-left: 10px; /* Extra spacing from back button */
+}
+
+#stats span {
+    background: rgba(51, 51, 51, 0.9);
+    padding: 12px;
+    border: 3px solid #ffd43b;
+    border-radius: 4px;
+    box-shadow: 0 4px 0 #e6b800, 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: #ffd43b;
+    text-shadow: 2px 2px 0 #000;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.7em;
+    width: 100%;
+}
+
+/* Question Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #2d3436;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    border: 4px solid #74b9ff;
+    box-shadow: 0 0 30px rgba(116, 185, 255, 0.3);
+    animation: modalPop 0.3s ease-out;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.modal-content p {
+    font-size: 0.8em;
+    line-height: 1.6;
+    margin: 15px 0;
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-content h2 {
+    color: #74b9ff;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#answers button {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    padding: 15px;
+    background: #0984e3;
+    border: 3px solid #74b9ff;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7em;
+    box-shadow: 0 4px 0 #0051a8, 0 6px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    top: 0;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#answers button:hover {
+    background: #0051a8;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #003d7a, 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+#answers button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 4px solid #ffd43b;
+    box-shadow: 0 -5px 15px rgba(255, 212, 59, 0.2);
+}
+
+footer p {
+    color: #ffd43b;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 15px;
+    font-size: 0.7em;
+    padding: 0 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+.social-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.social-icon {
+    display: inline-block;
+    padding: 10px;
+    background: #ffd43b;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 0 #e6b800;
+    position: relative;
+    top: 0;
+}
+
+.social-icon:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #e6b800;
+}
+
+.social-icon:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.social-icon img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) saturate(100%);
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}

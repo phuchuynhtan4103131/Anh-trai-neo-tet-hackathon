@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoQuest Adventure - Anh Trai Neo Tet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen">
+            <h1 data-text="EcoQuest Adventure">EcoQuest Adventure</h1>
+            <button id="play-btn" class="menu-button">Play</button>
+            <button id="instructions-btn" class="menu-button">Instructions</button>
+        </div>
+
+        <!-- Instructions Screen -->
+        <div id="instructions-screen" class="screen hidden">
+            <h2>How to Play</h2>
+            <div class="instructions-content">
+                <div class="control-section">
+                    <h3>Controls:</h3>
+                    <p>← or A: Move Left</p>
+                    <p>→ or D: Move Right</p>
+                    <p>↑ or SPACE: Jump</p>
+                </div>
+                <div class="gameplay-section">
+                    <h3>Gameplay:</h3>
+                    <p>• Jump and hit question blocks to answer environmental questions</p>
+                    <p>• Correct answers give you rewards (health or gold)</p>
+                    <p>• Wrong answers reduce your health</p>
+                    <p>• Reach checkpoints to save your progress</p>
+                    <p>• Complete levels by reaching the end</p>
+                </div>
+            </div>
+            <button id="back-to-menu-btn" class="menu-button">Back to Menu</button>
+        </div>
+
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas" class="hidden"></canvas>
+        
+        <!-- Back Button (in-game) -->
+        <button id="back-btn" class="back-button hidden">←</button>
+
+        <!-- Game UI -->
+        <div id="game-ui" class="hidden">
+            <div id="stats">
+                <span id="health">Health: 100</span>
+                <span id="gold">Gold: 0</span>
+                <span id="level">Level: 1</span>
+            </div>
+        </div>
+
+        <!-- Question Modal -->
+        <div id="question-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Environmental Question</h2>
+                <p id="question-text"></p>
+                <div id="answers"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Made by Anh Trai Neo Tet</p>
+        <div class="social-links">
+            <a href="https://github.com/phuchuynhtan4103131" target="_blank" class="social-icon">
+                <img src="assets/images/github-icon.png" alt="GitHub">
+            </a>
+            <a href="#" target="_blank" class="social-icon">
+                <img src="assets/images/instagram-icon.png" alt="Instagram">
+            </a>
+            <a href="#" target="_blank" class="social-icon">
+                <img src="assets/images/linkedin-icon.png" alt="LinkedIn">
+            </a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/gameEngine.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/questions.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
