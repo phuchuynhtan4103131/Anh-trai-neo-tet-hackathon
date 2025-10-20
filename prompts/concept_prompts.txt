@@ -1,0 +1,14 @@
+Initial Game Concept:
+"Create a web-based platformer game that educates players about environmental and social issues in Australia and Vietnam. The game should be engaging, educational, and incorporate quiz elements."
+
+Theme Development:
+"Help me develop a theme that combines environmental education with traditional platformer mechanics. The game should teach about climate change, social justice, and community development in Australia and Vietnam."
+
+Character Design:
+"Design a character that represents harmony between nature and technology. The character should be simple enough for a 2D platformer but memorable and thematically appropriate."
+
+Game Mechanics:
+"What are some unique game mechanics that could reinforce learning about environmental and social issues while keeping the game fun and engaging? Focus on platformer elements combined with educational content."
+
+Level Design Philosophy:
+"Help me design a level progression system that gradually introduces more complex environmental and social concepts while increasing gameplay difficulty."

@@ -1,0 +1,41 @@
+# Health System Refinement
+"The health deducts properly from 3 to 2, but if the health is 2 it cant deduct back to 1. Fix the health deduction issue."
+
+# Death Animation Polish
+"Fix the death animation to:
+- Play smoothly when taking damage
+- Reset position correctly
+- Maintain proper health state
+- Work consistently across levels"
+
+# Score System Implementation
+"Implement score tracking that:
+- Shows current score during gameplay
+- Displays high score on main menu
+- Updates after each action
+- Persists between sessions
+- Shows on game completion"
+
+# Gameplay Balance
+"Refine game mechanics for:
+- Better difficulty progression
+- Fair hazard placement
+- Appropriate reward values
+- Consistent health behavior
+- Smooth level transitions"
+
+# Bug Fixes
+"Address issues with:
+- Health reset behavior
+- Death animation consistency
+- Score tracking accuracy
+- Collision detection precision
+- Level transition states"
+
+# UI Polish
+"Improve interface elements:
+- Score display visibility
+- Health indicator clarity
+- Question modal readability
+- Menu screen layout
+- Tutorial instructions"

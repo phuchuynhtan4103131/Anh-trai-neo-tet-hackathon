@@ -1,0 +1,26 @@
+# Initial Game Concept
+"Create a web-based platformer game that teaches about environmental and social issues in Australia and Vietnam while providing engaging gameplay."
+
+# Educational Theme Integration
+"Integrate educational content about:
+- Climate change impacts on communities
+- Social inequality and access to services
+- Environmental conservation
+- Urban development challenges
+- Cultural preservation and adaptation"
+
+# Level Design Concepts
+"Design levels that:
+- Progress in difficulty
+- Integrate quiz elements naturally
+- Teach about environmental issues
+- Provide checkpoints for progress
+- Balance challenge and learning"
+
+# Game Flow
+"Create a game progression that:
+- Starts with basic mechanics
+- Gradually introduces environmental concepts
+- Provides clear feedback
+- Rewards learning and skill
+- Maintains player engagement"

@@ -1,0 +1,17 @@
+Character Visual Style:
+"Generate a pixel art style guide for the player character that combines angelic and environmental elements."
+
+Background Environments:
+"Create CSS styles for scrolling cloud backgrounds that give a sense of environmental themes."
+
+UI Elements:
+"Design retro-style game UI elements including hearts for health, question blocks, and checkpoint flags."
+
+Animation Frames:
+"Help me create animation states for the player character including idle, jump, and death animations."
+
+Visual Effects:
+"Design visual feedback effects for collecting items, answering questions, and hitting hazards."
+
+Level Visuals:
+"Create a cohesive visual style for platforms, hazards, and interactive elements that fits the environmental theme."

@@ -17,10 +17,16 @@ class GameEngine {
         this.currentLevel = 1;
         this.gameState = 'menu'; // menu, playing, paused
         this.funFacts = CONGRATS_FUN_FACTS;
+        this.score = 0;
+        this.bestScore = 0;
 
         this.baseCanvasSize = this.calculateBaseCanvasSize();
         this.applyCanvasSize(this.baseCanvasSize);
         window.addEventListener('resize', () => this.lockCanvasSize());
+
+        this.bestScore = this.loadBestScore();
+        this.updateScoreUI();
+        this.updateBestScoreUI();
 
         this.init();
     }
@@ -49,12 +55,79 @@ class GameEngine {
         this.applyCanvasSize(this.baseCanvasSize);
     }
 
+    loadBestScore() {
+        try {
+            const stored = localStorage.getItem('ecoquestBestScore');
+            const parsed = parseInt(stored, 10);
+            return Number.isFinite(parsed) ? parsed : 0;
+        } catch (error) {
+            return 0;
+        }
+    }
+
+    saveBestScore() {
+        try {
+            localStorage.setItem('ecoquestBestScore', String(this.bestScore));
+        } catch (error) {
+            // Ignore storage failures (for example private browsing)
+        }
+    }
+
+    updateScoreUI() {
+        const scoreEl = document.getElementById('score');
+        if (scoreEl) {
+            scoreEl.textContent = `Score: ${this.score}`;
+        }
+    }
+
+    updateBestScoreUI() {
+        const mainBest = document.getElementById('best-score');
+        if (mainBest) {
+            mainBest.textContent = `Best Score: ${this.bestScore}`;
+        }
+        const summaryBest = document.getElementById('best-score-summary');
+        if (summaryBest) {
+            summaryBest.textContent = `Best Score: ${this.bestScore}`;
+        }
+    }
+
+    updateFinalScoreUI() {
+        const finalScoreEl = document.getElementById('final-score');
+        if (finalScoreEl) {
+            finalScoreEl.textContent = `Final Score: ${this.score}`;
+        }
+    }
+
+    resetScore() {
+        this.score = 0;
+        this.updateScoreUI();
+        this.updateFinalScoreUI();
+    }
+
+    addScore(amount = 0) {
+        const value = Number(amount);
+        if (!Number.isFinite(value) || value === 0) {
+            return;
+        }
+        this.score = Math.max(0, this.score + Math.trunc(value));
+        this.updateScoreUI();
+
+        if (this.score > this.bestScore) {
+            this.bestScore = this.score;
+            this.saveBestScore();
+            this.updateBestScoreUI();
+        }
+    }
+
     init() {
         this.player = new Player(50, this.canvas.height - 60);  // Account for player height
         this.questions = new Questions();
         this.levels = new Levels(this.canvas.width, this.canvas.height);
         this.applyEntranceBackground();
         this.preparePlayerForCurrentLevel({ resetHealth: true, resetGold: true });
+        this.resetScore();
+        this.updateFinalScoreUI();
+        this.updateBestScoreUI();
         
         // Setup event listeners
         this.setupEventListeners();
@@ -134,6 +207,8 @@ class GameEngine {
         this.currentLevel = this.levels.currentLevel;
         this.applyLevelBackground();
         this.preparePlayerForCurrentLevel({ resetHealth: true, resetGold: true });
+        this.resetScore();
+        this.updateFinalScoreUI();
 
         if (this.questions) {
             if (typeof this.questions.forceClose === 'function') {
@@ -220,6 +295,10 @@ class GameEngine {
             resetHealth: resetToStart,
             resetGold: resetToStart
         });
+        if (resetToStart) {
+            this.resetScore();
+            this.updateFinalScoreUI();
+        }
 
         if (this.questions) {
             if (typeof this.questions.forceClose === 'function') {
@@ -259,6 +338,13 @@ class GameEngine {
             factElement.textContent = this.getRandomFunFact();
         }
 
+        if (this.score > this.bestScore) {
+            this.bestScore = this.score;
+            this.saveBestScore();
+        }
+        this.updateFinalScoreUI();
+        this.updateBestScoreUI();
+
         this.hideAllScreens();
         const congratsScreen = document.getElementById('congrats-screen');
         if (congratsScreen) {
@@ -274,8 +360,10 @@ class GameEngine {
         document.getElementById('back-btn').classList.remove('hidden');
         document.getElementById('level-menu-btn')?.classList.remove('hidden');
         if (this.player) {
+            this.resetScore();
             this.preparePlayerForCurrentLevel({ resetHealth: true, resetGold: true });
         }
+        this.updateFinalScoreUI();
         this.closeLevelSelect(false);
         // Resize canvas after showing area
         this.resizeCanvas();
@@ -311,6 +399,7 @@ class GameEngine {
         }
 
         this.applyEntranceBackground();
+        this.updateBestScoreUI();
     }
 
     hideAllScreens() {
@@ -474,6 +563,12 @@ class GameEngine {
         requestAnimationFrame(() => this.gameLoop());
     }
 }
+
+
+
+
+
+
 
 
 

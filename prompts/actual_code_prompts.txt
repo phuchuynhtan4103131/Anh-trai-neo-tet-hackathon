@@ -1,0 +1,39 @@
+# Core Game Logic
+"Implement core game mechanics:
+- Player movement and physics
+- Collision detection system
+- Level management
+- Question system
+- Score tracking"
+
+# Health and Lives System
+"Create a health system that:
+- Maintains 3 total lives across all stages
+- Reduces health on hazard collision
+- Resets position on damage
+- Resets to level 1 on death
+- Persists health between levels"
+
+# Score Implementation
+"Develop scoring system with:
+- +100 points for correct answers
+- +20 points for checkpoints
+- -20 points for hazard hits
+- Best score tracking
+- Score persistence"
+
+# Animation System
+"Implement animations for:
+- Player movement states
+- Death sequence
+- Damage feedback
+- Visual effects
+- UI transitions"
+
+# Game State Management
+"Create state management for:
+- Level progression
+- Health tracking
+- Score persistence
+- Question tracking
+- Checkpoint system"

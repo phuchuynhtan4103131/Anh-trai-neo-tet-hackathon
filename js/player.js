@@ -275,6 +275,9 @@ class Player {
         }
 
         this.hazardCooldown = 45; // Brief invulnerability to prevent accidental double hits
+        if (window.gameEngine && typeof window.gameEngine.addScore === 'function') {
+            window.gameEngine.addScore(-20);
+        }
         this.takeDamage(1, {
             respawn: true,
             cause: 'hazard',

@@ -1,0 +1,23 @@
+Player Movement System:
+"Implement smooth platformer physics with variable jump heights, coyote time, and precise collision detection."
+
+Question System:
+"Create a system for displaying and handling multiple-choice environmental questions when players hit question blocks."
+
+Level Management:
+"Implement a level management system that handles level progression, checkpoints, and player spawning."
+
+Game Engine Core:
+"Design a game engine class that manages game state, rendering, and updates for all game objects."
+
+Collision System:
+"Implement precise collision detection for platforms, hazards, and interactive elements."
+
+Score System:
+"Add a scoring system that rewards correct answers and reaching checkpoints while penalizing hazard hits."
+
+Animation Engine:
+"Create an animation system for the player character that handles multiple states and smooth transitions."
+
+Save System:
+"Implement a system to save and load the player's progress and best scores using localStorage."

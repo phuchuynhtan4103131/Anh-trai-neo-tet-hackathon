@@ -1,0 +1,31 @@
+# Visual Design
+"Design visual elements for:
+- Player character with environmental theme
+- Scrolling cloud backgrounds
+- Question blocks and checkpoints
+- Hearts for health system
+- Score display UI"
+
+# Animation Requirements
+"Create animations for:
+- Player movement (run, jump)
+- Death sequence
+- Question block interactions
+- Checkpoint activation
+- Environmental hazards"
+
+# UI Elements
+"Design UI components for:
+- Health display (hearts)
+- Score counter
+- Level indicators
+- Question modal
+- Menu screens"
+
+# Visual Effects
+"Implement visual feedback for:
+- Taking damage
+- Collecting rewards
+- Answering questions
+- Hitting checkpoints
+- Level transitions"

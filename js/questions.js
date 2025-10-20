@@ -175,10 +175,17 @@ class Questions {
         const isCheckpoint = type === 'checkpoint';
 
         if (isCorrect) {
+            if (window.gameEngine && typeof window.gameEngine.addScore === 'function') {
+                window.gameEngine.addScore(100);
+            }
+
             if (block) {
                 block.answered = true;
                 if (isCheckpoint && window.gameEngine?.player) {
                     window.gameEngine.player.setCheckpointFromBlock(block);
+                    if (typeof window.gameEngine.addScore === 'function') {
+                        window.gameEngine.addScore(20);
+                    }
                 }
             }
             if (block && block.type === 'bonus') {
