@@ -7,41 +7,59 @@ class GameEngine {
         this.levels = null;
         this.currentLevel = 1;
         this.gameState = 'menu'; // menu, playing, paused
-        
-        // Set canvas size
-        this.resizeCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
-        
-        // Initialize game components
+
+        this.baseCanvasSize = this.calculateBaseCanvasSize();
+        this.applyCanvasSize(this.baseCanvasSize);
+        window.addEventListener('resize', () => this.lockCanvasSize());
+
         this.init();
     }
 
-    resizeCanvas() {
-        this.canvas.width = window.innerWidth * 0.8;
-        this.canvas.height = window.innerHeight * 0.7;
+    calculateBaseCanvasSize() {
+        const widthTarget = Math.round(window.innerWidth * 0.8);
+        const heightTarget = Math.round(window.innerHeight * 0.7);
+
+        const maxWidth = Math.max(window.innerWidth - 20, 360);
+        const maxHeight = Math.max(window.innerHeight - 40, 300);
+        const minWidth = Math.min(window.innerWidth - 40, 720);
+        const minHeight = Math.min(window.innerHeight - 80, 480);
+
+        const width = Math.min(Math.max(widthTarget, minWidth), maxWidth);
+        const height = Math.min(Math.max(heightTarget, minHeight), maxHeight);
+
+        return { width, height };
+    }
+
+    applyCanvasSize(size) {
+        this.canvas.width = size.width;
+        this.canvas.height = size.height;
+    }
+
+    lockCanvasSize() {
+        this.applyCanvasSize(this.baseCanvasSize);
     }
 
     init() {
-        // Initialize game components
         this.player = new Player(50, this.canvas.height - 60);  // Account for player height
         this.questions = new Questions();
         this.levels = new Levels(this.canvas.width, this.canvas.height);
-        
-        // Setup event listeners
+        this.currentLevel = this.levels.currentLevel;
+
         this.setupEventListeners();
-        
-        // Start game loop
         this.gameLoop();
     }
 
     setupEventListeners() {
-        // Menu buttons
-        document.getElementById('play-btn').addEventListener('click', () => this.startGame());
-        document.getElementById('instructions-btn').addEventListener('click', () => this.showInstructions());
-        document.getElementById('back-to-menu-btn').addEventListener('click', () => this.showMainMenu());
-        document.getElementById('back-btn').addEventListener('click', () => this.showMainMenu());
-        
-        // Keyboard controls
+        const playBtn = document.getElementById('play-btn');
+        const instructionsBtn = document.getElementById('instructions-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const backBtn = document.getElementById('back-btn');
+
+        if (playBtn) playBtn.addEventListener('click', () => this.startGame());
+        if (instructionsBtn) instructionsBtn.addEventListener('click', () => this.showInstructions());
+        if (backToMenuBtn) backToMenuBtn.addEventListener('click', () => this.showMainMenu());
+        if (backBtn) backBtn.addEventListener('click', () => this.showMainMenu());
+
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('keyup', (e) => this.handleKeyUp(e));
     }
@@ -50,23 +68,32 @@ class GameEngine {
         this.gameState = 'playing';
         this.hideAllScreens();
         this.canvas.classList.remove('hidden');
-        document.getElementById('game-ui').classList.remove('hidden');
-        document.getElementById('back-btn').classList.remove('hidden');
+        document.getElementById('game-ui')?.classList.remove('hidden');
+        document.getElementById('back-btn')?.classList.remove('hidden');
     }
 
     showInstructions() {
         this.hideAllScreens();
-        document.getElementById('instructions-screen').classList.remove('hidden');
+        document.getElementById('instructions-screen')?.classList.remove('hidden');
     }
 
     showMainMenu() {
         this.gameState = 'menu';
         this.hideAllScreens();
-        document.getElementById('main-menu').classList.remove('hidden');
-        
-        // Reset game state if needed
+        document.getElementById('main-menu')?.classList.remove('hidden');
+
+        if (this.questions) {
+            this.questions.forceClose();
+            this.questions.resetAvailableQuestions();
+        }
+
         if (this.player) {
             this.player.reset();
+        }
+
+        if (this.levels) {
+            this.levels = new Levels(this.canvas.width, this.canvas.height);
+            this.currentLevel = this.levels.currentLevel;
         }
     }
 
@@ -78,15 +105,18 @@ class GameEngine {
             'game-ui',
             'back-btn'
         ];
-        
-        screens.forEach(screenId => {
-            document.getElementById(screenId).classList.add('hidden');
+
+        screens.forEach((screenId) => {
+            const el = document.getElementById(screenId);
+            if (el) {
+                el.classList.add('hidden');
+            }
         });
     }
 
     handleKeyDown(e) {
         if (this.gameState !== 'playing') return;
-        
+
         switch (e.code) {
             case 'ArrowLeft':
             case 'KeyA':
@@ -99,7 +129,7 @@ class GameEngine {
             case 'Space':
             case 'ArrowUp':
             case 'KeyW':
-                e.preventDefault(); // Prevent page scrolling or button activation
+                e.preventDefault();
                 this.player.jump();
                 break;
         }
@@ -107,7 +137,7 @@ class GameEngine {
 
     handleKeyUp(e) {
         if (this.gameState !== 'playing') return;
-        
+
         switch (e.code) {
             case 'ArrowLeft':
             case 'ArrowRight':
@@ -118,14 +148,37 @@ class GameEngine {
         }
     }
 
+    openQuestion(block) {
+        const type = block.type || 'bonus';
+        const difficulty = this.getDifficultyForLevel(this.currentLevel, type);
+
+        this.questions.showQuestion({
+            block,
+            type,
+            difficulty
+        });
+    }
+
+    getDifficultyForLevel(level, type) {
+        if (type === 'checkpoint') {
+            return Math.min(3, Math.max(2, level - 1));
+        }
+
+        if (level <= 2) return 1;
+        if (level <= 4) return 2;
+        return 3;
+    }
+
     checkCollisions() {
-        // Check collisions with platforms
-        const currentLevel = this.levels.getCurrentLevel();
+        const currentLevelData = this.levels.getCurrentLevel();
+        if (!currentLevelData) {
+            return;
+        }
+
         const groundThreshold = this.canvas.height - this.player.height - 0.5;
         let isGrounded = this.player.y >= groundThreshold;
 
-        // Check platform collisions
-        for (const platform of currentLevel.platforms) {
+        for (const platform of currentLevelData.platforms) {
             if (this.player.checkPlatformCollision(platform)) {
                 isGrounded = true;
             }
@@ -136,25 +189,30 @@ class GameEngine {
             this.player.isJumping = false;
         }
 
-        // Check collisions with question blocks
-        for (const block of currentLevel.questionBlocks) {
-            if (this.player.checkQuestionBlockCollision(block) && !block.answered) {
-                this.questions.showQuestion();
-                // Mark as answered only for bonus blocks
-                if (block.type === 'bonus') {
-                    block.answered = true;
+        if (!this.questions.isActive() && currentLevelData.questionBlocks) {
+            for (const block of currentLevelData.questionBlocks) {
+                if (!block.answered && this.player.checkQuestionBlockCollision(block)) {
+                    this.openQuestion(block);
+                    break;
                 }
             }
         }
 
-        // Check collisions with checkpoints
-        if (currentLevel.checkpoints) {
-            for (const checkpoint of currentLevel.checkpoints) {
-                if (this.player.checkQuestionBlockCollision(checkpoint) && !checkpoint.answered) {
-                    this.questions.showQuestion('checkpoint');
-                    checkpoint.answered = true;
+        if (!this.questions.isActive() && currentLevelData.checkpoints) {
+            for (const checkpoint of currentLevelData.checkpoints) {
+                if (!checkpoint.answered && this.player.checkQuestionBlockCollision(checkpoint)) {
+                    this.openQuestion(checkpoint);
+                    break;
                 }
             }
+        }
+
+        if (currentLevelData.hazards) {
+            currentLevelData.hazards.forEach((hazard) => {
+                if (this.player.collidesWithRect(hazard)) {
+                    this.player.applyHazardDamage(hazard.damage || 20, hazard);
+                }
+            });
         }
     }
 
@@ -163,24 +221,25 @@ class GameEngine {
 
         this.player.update();
         this.checkCollisions();
-        
-        // Check if level is complete
-        if (this.player.x >= this.canvas.width - 50) {
-            this.currentLevel++;
-            this.levels.loadLevel(this.currentLevel);
-            this.player.reset();
+
+        const goalLine = this.canvas.width - this.player.width - 10;
+        if (this.player.x >= goalLine) {
+            const nextLevel = this.currentLevel + 1;
+            if (this.levels.loadLevel(nextLevel)) {
+                this.currentLevel = nextLevel;
+                this.player.reset();
+            } else {
+                this.player.x = goalLine - 5;
+                this.player.velocityX = 0;
+            }
         }
     }
 
     render() {
-        // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         if (this.gameState === 'playing') {
-            // Draw current level
-            this.levels.getCurrentLevel().draw(this.ctx);
-            
-            // Draw player
+            this.levels.drawCurrentLevel(this.ctx);
             this.player.draw(this.ctx);
         }
     }

@@ -19,6 +19,7 @@ class Player {
         this.maxCoyoteTime = 6;      // Maximum frames for coyote time
         this.prevX = x;              // Previous frame X (for collision detection)
         this.prevY = y;              // Previous frame Y (for collision detection)
+        this.hazardCooldown = 0;     // Invulnerability frames after touching a hazard
     }
 
     moveLeft() {
@@ -61,6 +62,10 @@ class Player {
         // Handle jump cooldown
         if (this.jumpCooldown > 0) {
             this.jumpCooldown--;
+        }
+
+        if (this.hazardCooldown > 0) {
+            this.hazardCooldown--;
         }
 
         // Store previous position for collision checks
@@ -208,6 +213,35 @@ class Player {
         return false;
     }
 
+    collidesWithRect(rect) {
+        return (
+            this.x < rect.x + rect.width &&
+            this.x + this.width > rect.x &&
+            this.y < rect.y + rect.height &&
+            this.y + this.height > rect.y
+        );
+    }
+
+    applyHazardDamage(amount, hazard) {
+        if (this.hazardCooldown > 0) {
+            return false;
+        }
+
+        this.hazardCooldown = 45;
+        this.velocityY = Math.min(this.velocityY, -10);
+
+        if (hazard) {
+            const playerCenter = this.x + this.width / 2;
+            const hazardCenter = hazard.x + hazard.width / 2;
+            const knockbackDirection = playerCenter < hazardCenter ? -1 : 1;
+            this.x += knockbackDirection * 10;
+            this.x = Math.max(0, Math.min(this.x, window.gameEngine.canvas.width - this.width));
+        }
+
+        this.takeDamage(amount);
+        return true;
+    }
+
     takeDamage(amount) {
         this.health -= amount;
         document.getElementById('health').textContent = `Health: ${this.health}`;
@@ -234,6 +268,7 @@ class Player {
         this.health = 100;
         this.onGround = true;  // Reset ground state
         this.isJumping = false;  // Reset jumping state
+        this.hazardCooldown = 0;
         document.getElementById('health').textContent = `Health: ${this.health}`;
     }
 
