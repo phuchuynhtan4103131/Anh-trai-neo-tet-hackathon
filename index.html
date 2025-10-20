@@ -40,19 +40,25 @@
             <button id="back-to-menu-btn" class="menu-button">Back to Menu</button>
         </div>
 
-        <!-- Game Canvas -->
-        <canvas id="gameCanvas" class="hidden"></canvas>
-        
-        <!-- Back Button (in-game) -->
-        <button id="back-btn" class="back-button hidden">←</button>
+        <!-- Game Area (canvas + HUD) -->
+        <div id="game-area" class="hidden">
+            <canvas id="gameCanvas"></canvas>
 
-        <!-- Game UI -->
-        <div id="game-ui" class="hidden">
-            <div id="stats">
-                <span id="health">Health: 100</span>
-                <span id="gold">Gold: 0</span>
-                <span id="level">Level: 1</span>
+            <!-- Game UI (placed over the canvas inside the game-area) -->
+            <div id="game-ui">
+                <div id="stats">
+                    <div id="health-hearts" aria-label="Health">
+                        <img src="assets/images/heart.svg" class="heart" data-index="2" alt="Heart">
+                        <img src="assets/images/heart.svg" class="heart" data-index="1" alt="Heart">
+                        <img src="assets/images/heart.svg" class="heart" data-index="0" alt="Heart">
+                    </div>
+                    <span id="gold">Gold: 0</span>
+                    <span id="level">Level: 1</span>
+                </div>
             </div>
+
+            <!-- Back Button (in-game) -->
+            <button id="back-btn" class="back-button hidden">←</button>
         </div>
 
         <!-- Question Modal -->

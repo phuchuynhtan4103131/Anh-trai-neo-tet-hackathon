@@ -17,8 +17,16 @@ class GameEngine {
     }
 
     resizeCanvas() {
-        this.canvas.width = window.innerWidth * 0.8;
-        this.canvas.height = window.innerHeight * 0.7;
+        // Resize canvas to match the visual #game-area dimensions
+        const gameArea = document.getElementById('game-area');
+        if (gameArea) {
+            const rect = gameArea.getBoundingClientRect();
+            this.canvas.width = rect.width;
+            this.canvas.height = rect.height;
+        } else {
+            this.canvas.width = window.innerWidth * 0.8;
+            this.canvas.height = window.innerHeight * 0.7;
+        }
     }
 
     init() {
@@ -26,6 +34,10 @@ class GameEngine {
         this.player = new Player(50, this.canvas.height - 60);  // Account for player height
         this.questions = new Questions();
         this.levels = new Levels(this.canvas.width, this.canvas.height);
+        // Ensure hearts UI reflects player's health
+        if (this.player && typeof this.player.updateHeartsUI === 'function') {
+            this.player.updateHeartsUI();
+        }
         
         // Setup event listeners
         this.setupEventListeners();
@@ -49,9 +61,11 @@ class GameEngine {
     startGame() {
         this.gameState = 'playing';
         this.hideAllScreens();
-        this.canvas.classList.remove('hidden');
+        document.getElementById('game-area').classList.remove('hidden');
         document.getElementById('game-ui').classList.remove('hidden');
         document.getElementById('back-btn').classList.remove('hidden');
+        // Resize canvas after showing area
+        this.resizeCanvas();
     }
 
     showInstructions() {
@@ -74,7 +88,7 @@ class GameEngine {
         const screens = [
             'main-menu',
             'instructions-screen',
-            'gameCanvas',
+            'game-area',
             'game-ui',
             'back-btn'
         ];
@@ -139,11 +153,8 @@ class GameEngine {
         // Check collisions with question blocks
         for (const block of currentLevel.questionBlocks) {
             if (this.player.checkQuestionBlockCollision(block) && !block.answered) {
-                this.questions.showQuestion();
-                // Mark as answered only for bonus blocks
-                if (block.type === 'bonus') {
-                    block.answered = true;
-                }
+                // Pass the block to the Questions module so it can mark it answered after the player responds
+                this.questions.showQuestion(block);
             }
         }
 
@@ -151,8 +162,8 @@ class GameEngine {
         if (currentLevel.checkpoints) {
             for (const checkpoint of currentLevel.checkpoints) {
                 if (this.player.checkQuestionBlockCollision(checkpoint) && !checkpoint.answered) {
-                    this.questions.showQuestion('checkpoint');
-                    checkpoint.answered = true;
+                    // Pass checkpoint object to Questions so it can mark answered when the player finishes
+                    this.questions.showQuestion(checkpoint);
                 }
             }
         }
