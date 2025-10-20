@@ -25,39 +25,17 @@ body::before {
     left: 0;
     width: 200%;
     height: 100%;
-    background: url('../assets/images/clouds-5.svg');
-    background-size: contain;
-    background-repeat: repeat-x;
-    animation: floatingClouds 60s linear infinite;
+    background: url('../assets/images/clouds-5.svg') repeat-x;
+    background-size: auto 100%;
+    animation: scrollClouds 60s linear infinite;
+    will-change: transform;
     opacity: 0.6;
     z-index: -1;
 }
 
-@keyframes floatingClouds {
-    0% {
-        transform: translateX(0) scaleX(1);
-    }
-    25% {
-        transform: translateX(-25%) scaleX(1);
-    }
-    25.001% {
-        transform: translateX(-25%) scaleX(-1);
-    }
-    50% {
-        transform: translateX(-50%) scaleX(-1);
-    }
-    50.001% {
-        transform: translateX(-50%) scaleX(1);
-    }
-    75% {
-        transform: translateX(-75%) scaleX(1);
-    }
-    75.001% {
-        transform: translateX(-75%) scaleX(-1);
-    }
-    100% {
-        transform: translateX(-100%) scaleX(-1);
-    }
+@keyframes scrollClouds {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
 }
 
 @keyframes gradientBG {
@@ -90,27 +68,26 @@ body::before {
     width: 200%;
     height: 100%;
     left: 0;
-    background-size: contain;
+    background-size: auto 100%;
     background-repeat: repeat-x;
+    will-change: transform;
 }
 
 .level-1-bg::before {
     top: 10%;
-    background-image: url('../assets/images/clouds-2.svg');
-    animation: floatingClouds 80s linear infinite;
+    background: url('../assets/images/clouds-2.svg') repeat-x;
+    animation: scrollClouds 80s linear infinite;
     opacity: 0.7;
     z-index: -1;
-    transform-origin: center center;
 }
 
 .level-1-bg::after {
     top: 40%;
-    background-image: url('../assets/images/clouds-3.svg');
-    animation: floatingClouds 60s linear infinite;
+    background: url('../assets/images/clouds-3.svg') repeat-x;
+    animation: scrollClouds 60s linear infinite;
     animation-delay: -30s;
     opacity: 0.5;
     z-index: -2;
-    transform-origin: center center;
 }
 
 /* Level 2 - Day Theme */
@@ -125,27 +102,26 @@ body::before {
     width: 200%;
     height: 100%;
     left: 0;
-    background-size: contain;
+    background-size: auto 100%;
     background-repeat: repeat-x;
+    will-change: transform;
 }
 
 .level-2-bg::before {
     top: 20%;
-    background-image: url('../assets/images/clouds-3.svg');
-    animation: floatingClouds 65s linear infinite;
+    background: url('../assets/images/clouds-3.svg') repeat-x;
+    animation: scrollClouds 65s linear infinite;
     opacity: 0.8;
     z-index: -1;
-    transform-origin: center center;
 }
 
 .level-2-bg::after {
     top: 60%;
-    background-image: url('../assets/images/clouds-4.svg');
-    animation: floatingClouds 45s linear infinite;
+    background: url('../assets/images/clouds-4.svg') repeat-x;
+    animation: scrollClouds 45s linear infinite;
     animation-delay: -22.5s;
     opacity: 0.6;
     z-index: -2;
-    transform-origin: center center;
 }
 
 /* Level 3 - Dusk Theme */
@@ -160,27 +136,26 @@ body::before {
     width: 200%;
     height: 100%;
     left: 0;
-    background-size: contain;
+    background-size: auto 100%;
     background-repeat: repeat-x;
+    will-change: transform;
 }
 
 .level-3-bg::before {
     top: 15%;
-    background-image: url('../assets/images/clouds-4.svg');
-    animation: floatingClouds 70s linear infinite;
+    background: url('../assets/images/clouds-4.svg') repeat-x;
+    animation: scrollClouds 70s linear infinite;
     opacity: 0.7;
     z-index: -1;
-    transform-origin: center center;
 }
 
 .level-3-bg::after {
     top: 50%;
-    background-image: url('../assets/images/clouds-5.svg');
-    animation: floatingClouds 50s linear infinite;
+    background: url('../assets/images/clouds-5.svg') repeat-x;
+    animation: scrollClouds 50s linear infinite;
     animation-delay: -25s;
     opacity: 0.5;
     z-index: -2;
-    transform-origin: center center;
 }
 
 /* Level 4 - Night Theme */
@@ -195,27 +170,26 @@ body::before {
     width: 200%;
     height: 100%;
     left: 0;
-    background-size: contain;
+    background-size: auto 100%;
     background-repeat: repeat-x;
+    will-change: transform;
 }
 
 .level-4-bg::before {
     top: 5%;
-    background-image: url('../assets/images/clouds-5.svg');
-    animation: floatingClouds 90s linear infinite;
+    background: url('../assets/images/clouds-5.svg') repeat-x;
+    animation: scrollClouds 90s linear infinite;
     opacity: 0.6;
     z-index: -1;
-    transform-origin: center center;
 }
 
 .level-4-bg::after {
     top: 30%;
-    background-image: url('../assets/images/clouds-2.svg');
-    animation: floatingClouds 75s linear infinite;
+    background: url('../assets/images/clouds-2.svg') repeat-x;
+    animation: scrollClouds 75s linear infinite;
     animation-delay: -37.5s;
     opacity: 0.4;
     z-index: -2;
-    transform-origin: center center;
 }
 
 /* Main Menu */
