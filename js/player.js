@@ -36,8 +36,10 @@ class Player {
     }
 
     update() {
-        // Apply gravity
-        this.velocityY += this.gravity;
+        // Apply gravity if not on ground
+        if (!this.onGround) {
+            this.velocityY += this.gravity;
+        }
 
         // Update position with boundary checks
         const nextX = this.x + this.velocityX;
@@ -58,9 +60,12 @@ class Player {
             this.isJumping = false;  // Reset jump state when hitting ground
         }
 
-        // Apply terminal velocity
+        // Apply terminal velocity for falling
         if (!this.onGround) {
             this.velocityY = Math.min(this.velocityY, 15); // Terminal velocity
+        } else {
+            // Reset vertical velocity when on ground
+            this.velocityY = 0;
         }
 
         // Debug information
@@ -145,10 +150,12 @@ class Player {
 
     reset() {
         this.x = 50;
-        this.y = 500 - this.height;
+        this.y = window.gameEngine.canvas.height - this.height;  // Use canvas height for proper positioning
         this.velocityX = 0;
         this.velocityY = 0;
         this.health = 100;
+        this.onGround = true;  // Reset ground state
+        this.isJumping = false;  // Reset jumping state
         document.getElementById('health').textContent = `Health: ${this.health}`;
     }
 
