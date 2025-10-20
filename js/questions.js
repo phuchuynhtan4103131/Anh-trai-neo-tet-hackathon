@@ -44,6 +44,9 @@ class Questions {
             { question: "Which is a major cause of ocean plastic pollution?", answers: ["Proper recycling", "Single-use plastics and littering", "Banning plastics", "Using reusable bags"], correct: 1 },
             { question: "What practice supports pollinators like bees?", answers: ["Removing wildflowers", "Planting diverse native flowers", "Using broad-spectrum pesticides", "Eliminating hedgerows"], correct: 1 }
         ];
+        this.currentBlock = null;
+        this.activeContext = null;
+
         this.currentQuestion = null;
         this.modal = document.getElementById('question-modal');
         this.questionText = document.getElementById('question-text');
@@ -51,6 +54,7 @@ class Questions {
         this.currentQuestion = null;
         this.activeContext = null;
         this.isShowing = false;
+        this.currentBlock = null;
 
         this.buildPools();
     }
@@ -147,6 +151,7 @@ class Questions {
             this.answersDiv.appendChild(button);
         });
 
+        this.currentBlock = block;
         this.modal.classList.remove('hidden');
         this.isShowing = true;
     }
@@ -167,14 +172,16 @@ class Questions {
         const { block, type } = this.activeContext || {};
         const difficulty = this.currentQuestion.difficulty || 1;
         const isCorrect = selectedIndex === this.currentQuestion.correct;
-
-        if (block) {
-            block.answered = true;
-        }
+        const isCheckpoint = type === 'checkpoint';
 
         if (isCorrect) {
-            // If this question was triggered by a block, and it's a bonus, grant reward
-            if (this.currentBlock && this.currentBlock.type === 'bonus') {
+            if (block) {
+                block.answered = true;
+                if (isCheckpoint && window.gameEngine?.player) {
+                    window.gameEngine.player.setCheckpointFromBlock(block);
+                }
+            }
+            if (block && block.type === 'bonus') {
                 const rewards = [
                     { type: 'health', amount: 1 },
                     { type: 'gold', amount: 50 }
@@ -182,7 +189,7 @@ class Questions {
                 const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
                 if (reward.type === 'health') {
-                    window.gameEngine.player.health = Math.min(3, window.gameEngine.player.health + reward.amount);
+                    window.gameEngine.player.health = Math.min(window.gameEngine.player.maxHealth, window.gameEngine.player.health + reward.amount);
                     window.gameEngine.player.updateHeartsUI();
                 } else {
                     window.gameEngine.player.collectGold(reward.amount);
@@ -191,18 +198,24 @@ class Questions {
         } else {
             // Incorrect answer: deduct one heart
             window.gameEngine.player.takeDamage(1);
+            if (block && isCheckpoint) {
+                block.answered = false;
+            } else if (block) {
+                block.answered = true;
+            }
         }
 
         // If a block triggered this question, mark it answered and clear reference
         if (this.currentBlock) {
-            this.currentBlock.answered = true;
-            // Special handling for checkpoint-type blocks: nudge player back a bit
-            if (this.currentBlock.type === 'checkpoint') {
+            if (!isCheckpoint) {
+                this.currentBlock.answered = true;
+            }
+            if (isCheckpoint && !isCorrect) {
                 window.gameEngine.player.x = Math.max(0, window.gameEngine.player.x - 100);
             }
-            this.currentBlock = null;
         }
 
+        this.currentBlock = null;
         this.hideQuestion();
         return isCorrect;
     }
@@ -263,6 +276,7 @@ class Questions {
         this.currentQuestion = null;
         this.activeContext = null;
         this.isShowing = false;
+        this.currentBlock = null;
     }
 
     forceClose() {
@@ -272,3 +286,6 @@ class Questions {
         this.hideQuestion();
     }
 }
+
+
+

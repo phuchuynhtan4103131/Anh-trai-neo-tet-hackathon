@@ -204,7 +204,8 @@ class Levels {
             ],
             checkpoints: [
                 blockAtGround(0.42, { type: 'checkpoint' }),
-                blockFromPlatform(level5Platforms[6], { type: 'checkpoint' })
+                blockFromPlatform(level5Platforms[6], { type: 'checkpoint' }),
+                blockAtGround(0.92, { type: 'final' })
             ],
             hazards: [
                 createGroundHazard(0.3, 0.06, groundHeight + 24, 26),
@@ -240,16 +241,13 @@ class Levels {
     }
 
     updateBackgroundClass() {
-        const container = document.getElementById('game-container');
-        if (!container) {
+        if (typeof Levels.setBackgroundVariant !== 'function') {
             return;
         }
 
-        const classesToRemove = Array.from(container.classList).filter(cls => cls.startsWith('level-') && cls.endsWith('-bg'));
-        classesToRemove.forEach(cls => container.classList.remove(cls));
-
-        const backgroundIndex = Math.min(this.currentLevel, 5);
-        container.classList.add(`level-${backgroundIndex}-bg`);
+        const totalVariants = Levels.BACKGROUND_VARIANT_COUNT || 1;
+        const normalizedIndex = ((this.currentLevel - 1) % totalVariants) + 1;
+        Levels.setBackgroundVariant(normalizedIndex);
     }
 
     getMaxLevel() {
@@ -265,55 +263,109 @@ class Levels {
         ctx.save();
 
         // Draw platforms
-        ctx.fillStyle = '#666';
         level.platforms.forEach((platform) => {
+            // Fill
+            ctx.fillStyle = '#666';
             ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            // Border
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
         });
 
         // Draw hazards
         if (level.hazards && level.hazards.length > 0) {
             level.hazards.forEach((hazard) => {
-                ctx.fillStyle = '#ff5252';
+                ctx.save();
+
+                // Fill hazard
+                ctx.fillStyle = '#ff6b6b';
                 ctx.fillRect(hazard.x, hazard.y, hazard.width, hazard.height);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
+
+                // Add black border
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 3;
                 ctx.strokeRect(hazard.x, hazard.y, hazard.width, hazard.height);
+
+                ctx.restore();
             });
         }
 
         // Draw question blocks
-        ctx.font = '20px Arial';
-        ctx.textBaseline = 'middle';
-        ctx.textAlign = 'center';
         level.questionBlocks.forEach((block) => {
             if (block.answered) {
                 return;
             }
-            ctx.fillStyle = '#ffd700';
+            ctx.save();
+            ctx.fillStyle = '#ffe066';
             ctx.fillRect(block.x, block.y, block.width, block.height);
             ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.strokeRect(block.x, block.y, block.width, block.height);
+
+            const symbolSize = Math.max(16, block.width * 0.4);
+            ctx.font = `${symbolSize}px "Press Start 2P", cursive`;
             ctx.fillStyle = '#000';
-            ctx.fillText('?', block.x + block.width / 2, block.y + block.height / 2);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('?', block.x + block.width / 2, block.y + block.height / 2 + symbolSize * 0.05);
+            ctx.restore();
         });
 
         // Draw checkpoints
         if (level.checkpoints) {
             level.checkpoints.forEach((checkpoint) => {
-                ctx.fillStyle = checkpoint.answered ? 'rgba(116, 185, 255, 0.4)' : '#74b9ff';
+                ctx.save();
+
+                const baseColor = checkpoint.type === 'final' ? '#9b5de5' : '#74b9ff';
+                if (checkpoint.answered) {
+                    ctx.restore();
+                    return;
+                }
+                ctx.fillStyle = checkpoint.answered ? 'rgba(116, 185, 255, 0.3)' : baseColor;
                 ctx.fillRect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
                 ctx.strokeStyle = '#0c2461';
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 3;
                 ctx.strokeRect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
 
                 if (!checkpoint.answered) {
+                    const label = checkpoint.type === 'final' ? 'GO' : 'C';
+                    const size = Math.max(14, checkpoint.width * 0.32);
+                    ctx.font = `${size}px "Press Start 2P", cursive`;
                     ctx.fillStyle = '#0c2461';
-                    ctx.fillText('C', checkpoint.x + checkpoint.width / 2, checkpoint.y + checkpoint.height / 2);
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(label, checkpoint.x + checkpoint.width / 2, checkpoint.y + checkpoint.height / 2 + size * 0.05);
                 }
+
+                ctx.restore();
             });
         }
 
         ctx.restore();
     }
 }
+
+Levels.BACKGROUND_VARIANT_COUNT = 5;
+
+Levels.setBackgroundVariant = function setBackgroundVariant(variantIndex) {
+    const container = document.getElementById('game-container');
+    if (!container || typeof variantIndex !== 'number') {
+        return;
+    }
+
+    if (!container.classList.contains('clouds-bg')) {
+        container.classList.add('clouds-bg');
+    }
+
+    const classesToRemove = Array.from(container.classList).filter((cls) => cls.startsWith('clouds-bg-'));
+    classesToRemove.forEach((cls) => container.classList.remove(cls));
+
+    const legacyClasses = Array.from(container.classList).filter((cls) => cls.startsWith('level-') && cls.endsWith('-bg'));
+    legacyClasses.forEach((cls) => container.classList.remove(cls));
+
+    const totalVariants = Levels.BACKGROUND_VARIANT_COUNT || 1;
+    const normalizedIndex = ((variantIndex - 1) % totalVariants + totalVariants) % totalVariants + 1;
+
+    container.classList.add(`clouds-bg-${normalizedIndex}`);
+};

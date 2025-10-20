@@ -19,30 +19,15 @@ body {
     overflow-y: auto;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 200%;
-    height: 100%;
-    background: url('../assets/images/clouds-5.svg') repeat-x;
-    background-size: auto 100%;
-    animation: scrollClouds 60s linear infinite;
-    will-change: transform;
-    opacity: 0.6;
-    z-index: -1;
-}
-
-@keyframes scrollClouds {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-}
-
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+
+@keyframes scrollBackground {
+    from { background-position-x: 0; }
+    to { background-position-x: -200%; }
 }
 
 /* Game Container */
@@ -54,6 +39,8 @@ body::before {
     padding: 20px;
     position: relative;
     overflow: hidden;
+    background-color: #0f172a;
+    animation: scrollBackground 80s linear infinite;
 }
 
 /* The game-area wraps the canvas and HUD so UI elements are inside the game box */
@@ -70,147 +57,44 @@ body::before {
 #game-area #gameCanvas {
     width: 100%;
     height: 100%;
-    border: 4px solid #ffd43b;
+    border: 4px solid #000000;
     background: rgba(33, 37, 41, 0.8);
     border-radius: 8px;
-    box-shadow: 0 0 20px rgba(255, 212, 59, 0.3);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Level Background Variations */
-/* Level 1 - Dawn Theme */
-.level-1-bg {
-    background: linear-gradient(180deg, #ff7e5f 0%, #feb47b 100%);
-}
-
-.level-1-bg::before,
-.level-1-bg::after {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 100%;
-    left: 0;
-    background-size: auto 100%;
+/* Cloud Background Variations */
+#game-container.clouds-bg {
     background-repeat: repeat-x;
-    will-change: transform;
-}
-
-.level-1-bg::before {
-    top: 10%;
-    background: url('../assets/images/clouds-2.svg') repeat-x;
-    animation: scrollClouds 80s linear infinite;
-    opacity: 0.7;
-    z-index: -1;
-}
-
-.level-1-bg::after {
-    top: 40%;
-    background: url('../assets/images/clouds-3.svg') repeat-x;
-    animation: scrollClouds 60s linear infinite;
-    animation-delay: -30s;
-    opacity: 0.5;
-    z-index: -2;
-}
-
-/* Level 2 - Day Theme */
-.level-2-bg {
-    background: linear-gradient(180deg, #00c6fb 0%, #005bea 100%);
-}
-
-.level-2-bg::before,
-.level-2-bg::after {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 100%;
-    left: 0;
+    background-position: 0 0;
     background-size: auto 100%;
-    background-repeat: repeat-x;
-    will-change: transform;
+    transition: background-image 0.4s ease, background-color 0.4s ease;
+    animation: scrollBackground 50s linear infinite;
 }
 
-.level-2-bg::before {
-    top: 20%;
-    background: url('../assets/images/clouds-3.svg') repeat-x;
-    animation: scrollClouds 65s linear infinite;
-    opacity: 0.8;
-    z-index: -1;
+#game-container.clouds-bg-1 {
+    background-image: url('../assets/images/clouds-1.svg');
+    background-color: #9bd8ff;
 }
 
-.level-2-bg::after {
-    top: 60%;
-    background: url('../assets/images/clouds-4.svg') repeat-x;
-    animation: scrollClouds 45s linear infinite;
-    animation-delay: -22.5s;
-    opacity: 0.6;
-    z-index: -2;
+#game-container.clouds-bg-2 {
+    background-image: url('../assets/images/clouds-2.svg');
+    background-color: #8fcfff;
 }
 
-/* Level 3 - Dusk Theme */
-.level-3-bg {
-    background: linear-gradient(180deg, #4e54c8 0%, #8f94fb 100%);
+#game-container.clouds-bg-3 {
+    background-image: url('../assets/images/clouds-3.svg');
+    background-color: #a3caff;
 }
 
-.level-3-bg::before,
-.level-3-bg::after {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 100%;
-    left: 0;
-    background-size: auto 100%;
-    background-repeat: repeat-x;
-    will-change: transform;
+#game-container.clouds-bg-4 {
+    background-image: url('../assets/images/clouds-4.svg');
+    background-color: #8ec0ff;
 }
 
-.level-3-bg::before {
-    top: 15%;
-    background: url('../assets/images/clouds-4.svg') repeat-x;
-    animation: scrollClouds 70s linear infinite;
-    opacity: 0.7;
-    z-index: -1;
-}
-
-.level-3-bg::after {
-    top: 50%;
-    background: url('../assets/images/clouds-5.svg') repeat-x;
-    animation: scrollClouds 50s linear infinite;
-    animation-delay: -25s;
-    opacity: 0.5;
-    z-index: -2;
-}
-
-/* Level 4 - Night Theme */
-.level-4-bg {
-    background: linear-gradient(180deg, #2c3e50 0%, #3498db 100%);
-}
-
-.level-4-bg::before,
-.level-4-bg::after {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 100%;
-    left: 0;
-    background-size: auto 100%;
-    background-repeat: repeat-x;
-    will-change: transform;
-}
-
-.level-4-bg::before {
-    top: 5%;
-    background: url('../assets/images/clouds-5.svg') repeat-x;
-    animation: scrollClouds 90s linear infinite;
-    opacity: 0.6;
-    z-index: -1;
-}
-
-.level-4-bg::after {
-    top: 30%;
-    background: url('../assets/images/clouds-2.svg') repeat-x;
-    animation: scrollClouds 75s linear infinite;
-    animation-delay: -37.5s;
-    opacity: 0.4;
-    z-index: -2;
+#game-container.clouds-bg-5 {
+    background-image: url('../assets/images/clouds-5.svg');
+    background-color: #7fb5ff;
 }
 
 /* Main Menu */
@@ -271,6 +155,7 @@ h1 {
     align-items: center;
     justify-content: center;
     text-align: center;
+    line-height: 1.5;
 }
 
 .menu-button:hover {
@@ -282,6 +167,38 @@ h1 {
 .menu-button:active {
     transform: translateY(6px);
     box-shadow: 0 0 0 #e67700, 0 0 0 rgba(0, 0, 0, 0.3);
+}
+
+#congrats-screen .congrats-lead {
+    margin: 20px auto 30px;
+    color: #ffeaa7;
+    text-shadow: 3px 3px 0 #d35400;
+    max-width: 540px;
+    line-height: 1.6;
+}
+
+#congrats-screen .congrats-card {
+    background: rgba(15, 52, 96, 0.85);
+    border: 4px solid #74b9ff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    margin: 0 auto 30px;
+    max-width: 560px;
+    text-align: left;
+}
+
+#congrats-screen .congrats-card h3 {
+    color: #74b9ff;
+    text-shadow: 2px 2px 0 #0c2461;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+#congrats-screen .congrats-card p {
+    color: #dfe6e9;
+    line-height: 1.6;
+    font-size: 0.85em;
 }
 
 /* Instructions Screen */
@@ -363,6 +280,16 @@ h1 {
 .back-button:active {
     transform: translateY(4px);
     box-shadow: none;
+}
+
+#level-menu-btn {
+    width: 120px;
+    font-size: 0.75em;
+    letter-spacing: 1px;
+}
+
+#back-btn {
+    top: 90px;
 }
 
 /* Game Canvas */
@@ -471,7 +398,7 @@ h1 {
 .heart {
     width: 24px;
     height: 24px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff3b3b"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') center/contain no-repeat;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     transition: opacity 0.3s ease;
 }
 
@@ -543,6 +470,63 @@ h1 {
     text-align: center;
 }
 
+#level-select-modal .modal-content {
+    text-align: center;
+    background: #1f2a44;
+    border-color: #ffd43b;
+}
+
+#level-select-modal .modal-content p {
+    color: #ffeaa7;
+    margin-top: 0;
+}
+
+#level-select-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0 10px;
+}
+
+#level-select-buttons button {
+    min-width: 140px;
+    padding: 12px 18px;
+    font-size: 0.75em;
+    background: #74b9ff;
+    border: 3px solid #0c2461;
+    border-radius: 10px;
+    color: #0c2461;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: 'Press Start 2P', cursive;
+    box-shadow: 0 4px 0 #0c2461, 0 6px 12px rgba(12, 36, 97, 0.35);
+    text-transform: uppercase;
+    line-height: 1.6;
+}
+
+#level-select-buttons button:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #0c2461, 0 4px 8px rgba(12, 36, 97, 0.35);
+}
+
+#level-select-buttons button.active {
+    background: #ffd43b;
+    color: #000;
+    box-shadow: 0 4px 0 #e67700, 0 6px 12px rgba(230, 119, 0, 0.35);
+    pointer-events: none;
+}
+
+#level-select-buttons button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.modal-button {
+    width: auto;
+    min-width: 220px;
+}
+
 #answers button {
     display: block;
     width: 100%;
@@ -562,7 +546,7 @@ h1 {
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    line-height: 1.4;
+    line-height: 1.6;
     min-height: 60px;
     display: flex;
     align-items: center;
@@ -585,9 +569,11 @@ h1 {
 footer {
     text-align: center;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    border-top: 4px solid #ffd43b;
-    box-shadow: 0 -5px 15px rgba(255, 212, 59, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 2px solid rgba(255, 212, 59, 0.6);
+    box-shadow: 0 -5px 15px rgba(255, 212, 59, 0.1);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 footer p {

@@ -1,3 +1,35 @@
+const PLAYER_COLORS = Object.freeze({
+    halo: '#f6e69d',
+    haloHighlight: '#fff5ca',
+    bodyLight: '#d5f3ff',
+    bodyMid: '#b3e1ff',
+    bodyShadow: '#8fc6f3',
+    faceLight: '#f8d6cf',
+    faceShadow: '#e3b5ac',
+    eye: '#3f3158',
+    wingLight: '#ede4ff',
+    wingShadow: '#c5b8ff',
+    cloudLight: '#eafbff',
+    cloudShadow: '#bde9ff',
+    swirl: '#c7cffd'
+});
+
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.fill();
+}
+
 class Player {
     constructor(x, y) {
         this.x = x;
@@ -9,17 +41,22 @@ class Player {
         this.speed = 5;
         this.jumpForce = -15;        // Stronger jump
         this.gravity = 0.7;          // Increased gravity for snappier feel
-    this.onGround = true;
-    this.health = 3; // Use 3 hearts
+        this.onGround = true;
+        this.maxHealth = 3;
+        this.health = this.maxHealth;
         this.gold = 0;
-        this.jumpsLeft = 2;          // Allow double jump
-        this.maxJumps = 2;           // Maximum number of jumps allowed
+        this.jumpsLeft = 3;          // Allow triple jump
+        this.maxJumps = 3;           // Maximum number of jumps allowed
         this.jumpCooldown = 0;       // Cooldown between jumps
         this.coyoteTime = 0;         // Time window after leaving platform where jump is still allowed
         this.maxCoyoteTime = 6;      // Maximum frames for coyote time
         this.prevX = x;              // Previous frame X (for collision detection)
         this.prevY = y;              // Previous frame Y (for collision detection)
         this.hazardCooldown = 0;     // Invulnerability frames after touching a hazard
+        this.startX = x;
+        this.startY = y;
+        this.spawnX = x;
+        this.spawnY = y;
     }
 
     moveLeft() {
@@ -49,6 +86,7 @@ class Player {
             this.velocityY = this.jumpForce;
             this.onGround = false;
             this.coyoteTime = 0;
+        this.hazardCooldown = 0;
             this.jumpCooldown = 4; // Add a small cooldown between jumps
             
             // Slightly reduce the power of subsequent jumps
@@ -59,6 +97,7 @@ class Player {
     }
 
     update() {
+
         // Handle jump cooldown
         if (this.jumpCooldown > 0) {
             this.jumpCooldown--;
@@ -76,6 +115,7 @@ class Player {
         if (this.onGround && this.velocityY !== 0) {
             this.onGround = false;
             this.coyoteTime = 0;
+            this.hazardCooldown = 0;
         }
 
         // Update coyote time
@@ -109,6 +149,7 @@ class Player {
             this.onGround = true;
             this.jumpsLeft = this.maxJumps;
             this.coyoteTime = 0;
+        this.hazardCooldown = 0;
         }
 
         // Reset jumps when properly on ground
@@ -146,6 +187,7 @@ class Player {
             if (wasStanding && this.onGround) {
                 this.onGround = false;
                 this.coyoteTime = 0;
+        this.hazardCooldown = 0;
             }
             return false;
         }
@@ -163,6 +205,7 @@ class Player {
             this.onGround = true;
             this.jumpsLeft = this.maxJumps;
             this.coyoteTime = 0;
+        this.hazardCooldown = 0;
             // Freeze previous Y to the snapped position so next collision check treats us as standing
             this.prevY = this.y;
             return true;
@@ -194,6 +237,7 @@ class Player {
             this.onGround = true;
             this.jumpsLeft = this.maxJumps;
             this.coyoteTime = 0;
+        this.hazardCooldown = 0;
             this.prevY = this.y;
             return true;
         }
@@ -230,36 +274,36 @@ class Player {
             return false;
         }
 
-        this.hazardCooldown = 45;
-        this.velocityY = Math.min(this.velocityY, -10);
-
-        if (hazard) {
-            const playerCenter = this.x + this.width / 2;
-            const hazardCenter = hazard.x + hazard.width / 2;
-            const knockbackDirection = playerCenter < hazardCenter ? -1 : 1;
-            this.x += knockbackDirection * 10;
-            this.x = Math.max(0, Math.min(this.x, window.gameEngine.canvas.width - this.width));
-        }
-
-        this.takeDamage(amount);
+        this.hazardCooldown = 45; // Brief invulnerability to prevent accidental double hits
+        this.takeDamage(1, {
+            respawn: true,
+            cause: 'hazard',
+            useCheckpoint: false
+        });
         return true;
     }
 
-    takeDamage(amount) {
-        this.health -= amount;
-        this.updateHeartsUI();
-        if (this.health <= 0) {
-            // Reset to beginning of current stage/level
-            if (window.gameEngine && window.gameEngine.levels) {
-                // Reset player position only
-                this.resetPositionToLevelStart();
-                // Restore full health for the retry
-                this.health = 3;
-                this.updateHeartsUI();
-            } else {
-                this.die();
-            }
+    takeDamage(amount, options = {}) {
+        const damage = Math.max(0, Math.floor(amount));
+        if (damage <= 0) {
+            return false;
         }
+
+        const { respawn = false, cause = null, useCheckpoint = true } = options;
+        const previousHealth = this.health;
+        this.health = Math.max(0, this.health - damage);
+
+        if (this.health !== previousHealth) {
+            this.updateHeartsUI();
+        }
+
+        if (this.health <= 0) {
+            window.gameEngine?.handlePlayerOutOfLives({ cause });
+        } else if (respawn) {
+            window.gameEngine?.handlePlayerRespawn({ cause, useCheckpoint });
+        }
+
+        return this.health !== previousHealth;
     }
 
     updateHeartsUI() {
@@ -276,40 +320,229 @@ class Player {
         }
     }
 
-    resetPositionToLevelStart() {
-        // Move player to level start (x=50) and ground y
-        this.x = 50;
-        this.y = window.gameEngine.canvas.height - this.height;
-        this.velocityX = 0;
-        this.velocityY = 0;
-        this.onGround = true;
-        this.jumpsLeft = this.maxJumps;
-        this.coyoteTime = 0;
-    }
-
     collectGold(amount) {
         this.gold += amount;
         document.getElementById('gold').textContent = `Gold: ${this.gold}`;
     }
 
-    die() {
-        // Reset player position and health
-        this.reset();
-    }
+    respawnAtLevelStart(options = {}) {
+        const { useCheckpoint = true } = options;
+        const canvas = window.gameEngine?.canvas;
+        const canvasWidth = canvas ? canvas.width : 0;
+        const canvasHeight = canvas ? canvas.height : 0;
 
-    reset() {
-        this.x = 50;
-        this.y = window.gameEngine.canvas.height - this.height;  // Use canvas height for proper positioning
+        const baseStartX = typeof this.startX === 'number' ? this.startX : 50;
+        const baseStartY = typeof this.startY === 'number' ? this.startY : (canvasHeight - this.height);
+        const targetX = useCheckpoint && typeof this.spawnX === 'number' ? this.spawnX : baseStartX;
+        const targetY = useCheckpoint && typeof this.spawnY === 'number' ? this.spawnY : baseStartY;
+
+        this.x = Math.max(0, Math.min(targetX, canvasWidth - this.width));
+        this.y = Math.max(0, Math.min(targetY, canvasHeight - this.height));
         this.velocityX = 0;
         this.velocityY = 0;
-        this.health = 3;
-        this.onGround = true;  // Reset ground state
-        this.isJumping = false;  // Reset jumping state
+        this.onGround = true;
+        this.jumpsLeft = this.maxJumps;
+        this.coyoteTime = 0;
+        this.hazardCooldown = 0;
+    }
+
+    resetPositionToLevelStart(options = {}) {
+        this.respawnAtLevelStart(options);
+    }
+
+    resetLevelPosition() {
+        this.clearCheckpoint();
+        this.respawnAtLevelStart({ useCheckpoint: false });
         this.updateHeartsUI();
     }
 
+    reset() {
+        this.health = this.maxHealth;
+        this.updateHeartsUI();
+        this.gold = 0;
+        document.getElementById('gold').textContent = `Gold: ${this.gold}`;
+        this.clearCheckpoint();
+        this.respawnAtLevelStart({ useCheckpoint: false });
+    }
+
+    setLevelStartPosition(x, y) {
+        this.startX = x;
+        this.startY = y;
+        this.setDefaultSpawn();
+    }
+
+    setDefaultSpawn() {
+        this.spawnX = this.startX;
+        this.spawnY = this.startY;
+    }
+
+    setCheckpointFromBlock(block) {
+        if (!block) {
+            return;
+        }
+        const canvas = window.gameEngine?.canvas;
+        const canvasWidth = canvas ? canvas.width : (this.spawnX + this.width);
+        const canvasHeight = canvas ? canvas.height : (this.spawnY + this.height);
+
+        const landingX = block.x + block.width / 2 - this.width / 2;
+        const landingY = block.y - this.height;
+        this.spawnX = Math.max(0, Math.min(landingX, canvasWidth - this.width));
+        this.spawnY = Math.max(0, Math.min(landingY, canvasHeight - this.height));
+    }
+
+    clearCheckpoint() {
+        this.setDefaultSpawn();
+    }
+
     draw(ctx) {
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.save();
+
+        const drawX = this.x;
+        const drawY = this.y;
+
+        ctx.translate(drawX, drawY);
+        
+        const w = this.width;
+        const h = this.height;
+
+        const cloudHeight = h * 0.28;
+        const bodyHeight = h * 0.58;
+        const bodyWidth = w * 0.72;
+        const bodyX = (w - bodyWidth) / 2;
+        const bodyBottom = h - cloudHeight * 0.2;
+        const bodyY = bodyBottom - bodyHeight;
+
+        const cloudCenterX = w / 2;
+        const cloudTopY = h - cloudHeight;
+
+        ctx.fillStyle = PLAYER_COLORS.cloudShadow;
+        ctx.beginPath();
+        ctx.ellipse(cloudCenterX, cloudTopY + cloudHeight * 0.75, w * 0.45, cloudHeight * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = PLAYER_COLORS.cloudLight;
+        ctx.beginPath();
+        ctx.ellipse(cloudCenterX, cloudTopY + cloudHeight * 0.55, w * 0.4, cloudHeight * 0.45, 0, 0, Math.PI * 2);
+        ctx.ellipse(cloudCenterX - w * 0.22, cloudTopY + cloudHeight * 0.7, w * 0.22, cloudHeight * 0.4, 0, 0, Math.PI * 2);
+        ctx.ellipse(cloudCenterX + w * 0.22, cloudTopY + cloudHeight * 0.7, w * 0.22, cloudHeight * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        const bodyGradient = ctx.createLinearGradient(bodyX, bodyY, bodyX, bodyY + bodyHeight);
+        bodyGradient.addColorStop(0, PLAYER_COLORS.bodyLight);
+        bodyGradient.addColorStop(0.55, PLAYER_COLORS.bodyMid);
+        bodyGradient.addColorStop(1, PLAYER_COLORS.bodyShadow);
+
+        ctx.fillStyle = bodyGradient;
+        drawRoundedRect(ctx, bodyX, bodyY, bodyWidth, bodyHeight, w * 0.12);
+
+        ctx.strokeStyle = PLAYER_COLORS.swirl;
+        ctx.lineWidth = Math.max(1, w * 0.035);
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.moveTo(bodyX + bodyWidth * 0.22, bodyY + bodyHeight * 0.45);
+        ctx.quadraticCurveTo(
+            bodyX + bodyWidth * 0.35,
+            bodyY + bodyHeight * 0.1,
+            bodyX + bodyWidth * 0.58,
+            bodyY + bodyHeight * 0.35
+        );
+        ctx.quadraticCurveTo(
+            bodyX + bodyWidth * 0.75,
+            bodyY + bodyHeight * 0.6,
+            bodyX + bodyWidth * 0.5,
+            bodyY + bodyHeight * 0.72
+        );
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        const faceWidth = bodyWidth * 0.5;
+        const faceHeight = bodyHeight * 0.45;
+        const faceX = (w - faceWidth) / 2;
+        const faceY = bodyY + bodyHeight * 0.38;
+
+        const faceGradient = ctx.createLinearGradient(faceX, faceY, faceX + faceWidth, faceY + faceHeight);
+        faceGradient.addColorStop(0, PLAYER_COLORS.faceLight);
+        faceGradient.addColorStop(1, PLAYER_COLORS.faceShadow);
+
+        ctx.fillStyle = faceGradient;
+        drawRoundedRect(ctx, faceX, faceY, faceWidth, faceHeight, w * 0.08);
+
+        const eyeSize = Math.max(2, faceWidth * 0.12);
+        const eyeY = faceY + faceHeight * 0.36;
+        const eyeGap = faceWidth * 0.18;
+
+        ctx.fillStyle = PLAYER_COLORS.eye;
+        ctx.fillRect(faceX + eyeGap, eyeY, eyeSize, eyeSize * 1.1);
+        ctx.fillRect(faceX + faceWidth - eyeGap - eyeSize, eyeY, eyeSize, eyeSize * 1.1);
+
+        const mouthWidth = eyeSize * 0.8;
+        const mouthHeight = Math.max(1, eyeSize * 0.25);
+        const mouthX = faceX + faceWidth / 2 - mouthWidth / 2;
+        const mouthY = eyeY + eyeSize * 1.25;
+        ctx.fillRect(mouthX, mouthY, mouthWidth, mouthHeight);
+
+        ctx.fillStyle = PLAYER_COLORS.faceLight;
+        ctx.globalAlpha = 0.5;
+        ctx.beginPath();
+        ctx.arc(faceX + eyeGap - eyeSize * 0.3, eyeY + eyeSize * 0.95, eyeSize * 0.8, 0, Math.PI * 2);
+        ctx.arc(faceX + faceWidth - eyeGap + eyeSize * 0.3, eyeY + eyeSize * 0.95, eyeSize * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        const drawWing = (side) => {
+            const isLeft = side === 'left';
+            const wingWidth = bodyWidth * 0.4;
+            const wingHeight = bodyHeight * 0.5;
+            const wingTop = bodyY + bodyHeight * 0.3;
+
+            ctx.save();
+            ctx.translate(isLeft ? bodyX : bodyX + bodyWidth, wingTop);
+            ctx.scale(isLeft ? -1 : 1, 1);
+
+            const wingGradient = ctx.createLinearGradient(0, 0, wingWidth, wingHeight);
+            wingGradient.addColorStop(0, PLAYER_COLORS.wingLight);
+            wingGradient.addColorStop(1, PLAYER_COLORS.wingShadow);
+
+            ctx.fillStyle = wingGradient;
+            ctx.beginPath();
+            ctx.moveTo(0, bodyHeight * 0.1);
+            ctx.quadraticCurveTo(wingWidth * 0.35, -wingHeight * 0.2, wingWidth, wingHeight * 0.15);
+            ctx.quadraticCurveTo(wingWidth * 0.75, wingHeight * 0.45, wingWidth * 0.45, wingHeight * 0.7);
+            ctx.quadraticCurveTo(wingWidth * 0.18, wingHeight * 0.9, 0, wingHeight * 0.6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        };
+
+        drawWing('left');
+        drawWing('right');
+
+        const haloY = bodyY - h * 0.12;
+        ctx.lineWidth = Math.max(1.2, h * 0.04);
+        ctx.strokeStyle = PLAYER_COLORS.halo;
+        ctx.beginPath();
+        ctx.ellipse(w / 2, haloY, bodyWidth * 0.45, h * 0.08, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.lineWidth = Math.max(0.8, h * 0.02);
+        ctx.strokeStyle = PLAYER_COLORS.haloHighlight;
+        ctx.beginPath();
+        ctx.ellipse(w / 2, haloY, bodyWidth * 0.45, h * 0.08, 0, Math.PI * 0.2, Math.PI * 1.1);
+        ctx.stroke();
+
+        ctx.restore();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
