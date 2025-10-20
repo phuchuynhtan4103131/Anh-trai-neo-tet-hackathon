@@ -23,7 +23,7 @@ class GameEngine {
 
     init() {
         // Initialize game components
-        this.player = new Player(50, this.canvas.height - 100);
+        this.player = new Player(50, this.canvas.height - 60);  // Account for player height
         this.questions = new Questions();
         this.levels = new Levels(this.canvas.width, this.canvas.height);
         
