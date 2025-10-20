@@ -17,6 +17,8 @@ class Player {
         this.jumpCooldown = 0;       // Cooldown between jumps
         this.coyoteTime = 0;         // Time window after leaving platform where jump is still allowed
         this.maxCoyoteTime = 6;      // Maximum frames for coyote time
+        this.prevX = x;              // Previous frame X (for collision detection)
+        this.prevY = y;              // Previous frame Y (for collision detection)
     }
 
     moveLeft() {
@@ -60,6 +62,10 @@ class Player {
         if (this.jumpCooldown > 0) {
             this.jumpCooldown--;
         }
+
+        // Store previous position for collision checks
+        this.prevX = this.x;
+        this.prevY = this.y;
 
         // If we're on the ground but about to move, check if we should start coyote time
         if (this.onGround && this.velocityY !== 0) {
@@ -108,56 +114,80 @@ class Player {
     }
 
     checkPlatformCollision(platform) {
-        // Get the player's bounds
-        const nextX = this.x + this.velocityX;
-        const nextY = this.y + this.velocityY;
-        const wasAbove = this.y + this.height <= platform.y;
-        const wasBelow = this.y >= platform.y + platform.height;
-        const wasLeft = this.x + this.width <= platform.x;
-        const wasRight = this.x >= platform.x + platform.width;
+        // Use previous frame position to determine approach
+        const nextX = this.x;
+        const nextY = this.y;
+        const prevX = this.prevX;
+        const prevY = this.prevY;
 
-        // Projected position collision check
-        const willCollide = (
-            nextX < platform.x + platform.width &&
-            nextX + this.width > platform.x &&
-            nextY < platform.y + platform.height &&
-            nextY + this.height > platform.y
+        // A small tolerance to handle float imprecision and frame skips
+        const landingTolerance = 6;
+
+        // Basic AABB check for overlap at the new position
+        // Use a small epsilon to treat touching edges as collision to avoid falling through
+        const eps = 0.001;
+        const overlap = (
+            nextX < platform.x + platform.width - eps &&
+            nextX + this.width > platform.x + eps &&
+            nextY < platform.y + platform.height - eps &&
+            nextY + this.height > platform.y - eps
         );
 
-        if (!willCollide) {
-            // If we were standing on this platform and now we're not
-            if (wasAbove && this.onGround && 
-                this.x + this.width > platform.x && 
-                this.x < platform.x + platform.width) {
+        if (!overlap) {
+            // If we were standing on this platform and now we are slightly off it, start coyote
+            const wasStanding = (prevY + this.height <= platform.y + 1) &&
+                                (prevX + this.width > platform.x + eps) &&
+                                (prevX < platform.x + platform.width - eps);
+            if (wasStanding && this.onGround) {
                 this.onGround = false;
                 this.coyoteTime = 0;
             }
             return false;
         }
 
-        // Handle collisions based on approach direction
-        if (wasAbove) {
-            // Landing on top of platform
-            if (this.velocityY >= 0) {
-                this.y = platform.y - this.height;
-                this.velocityY = 0;
-                this.onGround = true;
-                this.jumpsLeft = this.maxJumps;
-                this.coyoteTime = 0;
-                return true;
-            }
-        } else if (wasBelow) {
-            // Hitting from below
-            this.y = platform.y + platform.height;
+        // If we overlapped, determine how we collided using previous position
+        const cameFromAbove = (prevY + this.height) <= platform.y + landingTolerance;
+        const cameFromBelow = prevY >= platform.y + platform.height - landingTolerance;
+        const cameFromLeft = (prevX + this.width) <= platform.x;
+        const cameFromRight = prevX >= platform.x + platform.width;
+
+        if (cameFromAbove && this.velocityY >= 0) {
+            // Landing on top
+            this.y = platform.y - this.height;
             this.velocityY = 0;
-        } else if (wasLeft) {
-            // Hitting from left
+            this.onGround = true;
+            this.jumpsLeft = this.maxJumps;
+            this.coyoteTime = 0;
+            return true;
+        }
+
+        if (cameFromBelow) {
+            // Hit underside
+            this.y = platform.y + platform.height;
+            if (this.velocityY < 0) this.velocityY = 0;
+            return true;
+        }
+
+        if (cameFromLeft) {
             this.x = platform.x - this.width;
             this.velocityX = 0;
-        } else if (wasRight) {
-            // Hitting from right
+            return true;
+        }
+
+        if (cameFromRight) {
             this.x = platform.x + platform.width;
             this.velocityX = 0;
+            return true;
+        }
+
+        // Fallback: if overlapping but none of the above, try to resolve by snapping to top when moving downward
+        if (this.velocityY >= 0) {
+            this.y = platform.y - this.height;
+            this.velocityY = 0;
+            this.onGround = true;
+            this.jumpsLeft = this.maxJumps;
+            this.coyoteTime = 0;
+            return true;
         }
 
         return false;
