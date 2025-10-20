@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Press Start 2P', cursive;
-    background: #0a0a0a;  /* Dark background but not completely black */
+    background: #0a0a0a;
     color: white;
     min-height: 100vh;
     display: flex;
@@ -107,7 +107,7 @@ body::before {
     top: 40%;
     background-image: url('../assets/images/clouds-3.svg');
     animation: floatingClouds 60s linear infinite;
-    animation-delay: -30s;  /* Offset to create varied movement */
+    animation-delay: -30s;
     opacity: 0.5;
     z-index: -2;
     transform-origin: center center;
@@ -142,7 +142,7 @@ body::before {
     top: 60%;
     background-image: url('../assets/images/clouds-4.svg');
     animation: floatingClouds 45s linear infinite;
-    animation-delay: -22.5s;  /* Offset to create varied movement */
+    animation-delay: -22.5s;
     opacity: 0.6;
     z-index: -2;
     transform-origin: center center;
@@ -177,7 +177,7 @@ body::before {
     top: 50%;
     background-image: url('../assets/images/clouds-5.svg');
     animation: floatingClouds 50s linear infinite;
-    animation-delay: -25s;  /* Offset to create varied movement */
+    animation-delay: -25s;
     opacity: 0.5;
     z-index: -2;
     transform-origin: center center;
@@ -212,7 +212,7 @@ body::before {
     top: 30%;
     background-image: url('../assets/images/clouds-2.svg');
     animation: floatingClouds 75s linear infinite;
-    animation-delay: -37.5s;  /* Offset to create varied movement */
+    animation-delay: -37.5s;
     opacity: 0.4;
     z-index: -2;
     transform-origin: center center;
@@ -227,6 +227,15 @@ body::before {
     padding: 20px;
 }
 
+#main-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
 h1 {
     font-size: 2.5em;
     margin: 0 auto 40px;
@@ -234,33 +243,13 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 2px;
     color: #ffd43b;
-    -webkit-text-stroke: 2px #e67700;
+    text-shadow: 4px 4px 0 #e67700, 6px 6px 10px rgba(0, 0, 0, 0.5);
     position: relative;
     animation: titleFloat 2s ease-in-out infinite;
-    width: fit-content;
+    width: 100%;
+    max-width: 900px;
     text-align: center;
-}
-
-h1::before {
-    content: attr(data-text);
-    position: absolute;
-    left: -4px;
-    top: -4px;
-    width: 100%;
-    color: #ffe066;
-    -webkit-text-stroke: 0;
-    animation: glitch 5s infinite linear alternate-reverse;
-}
-
-h1::after {
-    content: attr(data-text);
-    position: absolute;
-    left: 4px;
-    top: 4px;
-    width: 100%;
-    color: #ff922b;
-    -webkit-text-stroke: 0;
-    animation: glitch 4s infinite linear alternate;
+    line-height: 1.4;
 }
 
 @keyframes titleFloat {
@@ -268,17 +257,8 @@ h1::after {
     50% { transform: translateY(-10px); }
 }
 
-@keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
-}
-
 .menu-button {
-    display: block;
+    display: flex;
     width: 200px;
     margin: 20px auto;
     padding: 15px 30px;
@@ -293,6 +273,9 @@ h1::after {
     box-shadow: 0 6px 0 #e67700, 0 8px 10px rgba(0, 0, 0, 0.3);
     position: relative;
     top: 0;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .menu-button:hover {
@@ -373,7 +356,7 @@ h1::after {
     font-family: 'Press Start 2P', cursive;
     box-shadow: 0 4px 0 #e67700, 0 6px 10px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
-    padding-bottom: 4px; /* Better center the arrow visually */
+    padding-bottom: 4px;
 }
 
 .back-button:hover {
@@ -385,12 +368,6 @@ h1::after {
 .back-button:active {
     transform: translateY(4px);
     box-shadow: none;
-}
-
-.menu-button:hover {
-    background: white;
-    color: black;
-    transform: scale(1.05);
 }
 
 /* Game Canvas */
@@ -407,7 +384,7 @@ h1::after {
 #game-ui {
     position: absolute;
     top: 20px;
-    left: 90px; /* Moved right to make room for back button */
+    left: 90px;
     font-size: 0.8em;
     text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
     z-index: 900;
@@ -418,7 +395,7 @@ h1::after {
     flex-direction: column;
     gap: 10px;
     min-width: 200px;
-    margin-left: 10px; /* Extra spacing from back button */
+    margin-left: 10px;
 }
 
 #stats span {

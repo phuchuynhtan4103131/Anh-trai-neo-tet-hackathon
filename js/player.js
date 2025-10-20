@@ -7,12 +7,16 @@ class Player {
         this.velocityX = 0;
         this.velocityY = 0;
         this.speed = 5;
-        this.jumpForce = -12;
-        this.gravity = 0.5;
+        this.jumpForce = -15;        // Stronger jump
+        this.gravity = 0.7;          // Increased gravity for snappier feel
         this.onGround = true;
         this.health = 100;
         this.gold = 0;
-        this.isJumping = false;  // Track if player is currently in a jump
+        this.jumpsLeft = 2;          // Allow double jump
+        this.maxJumps = 2;           // Maximum number of jumps allowed
+        this.jumpCooldown = 0;       // Cooldown between jumps
+        this.coyoteTime = 0;         // Time window after leaving platform where jump is still allowed
+        this.maxCoyoteTime = 6;      // Maximum frames for coyote time
     }
 
     moveLeft() {
@@ -28,17 +32,51 @@ class Player {
     }
 
     jump() {
-        if (this.onGround && !this.isJumping) {
+        // Check if we can jump (either on ground, in coyote time, or have jumps left)
+        if (this.jumpCooldown > 0) return; // Prevent jump spam
+        
+        if (this.onGround || this.coyoteTime > 0 || this.jumpsLeft > 0) {
+            // If on ground or in coyote time, reset jump count first
+            if (this.onGround || this.coyoteTime > 0) {
+                this.jumpsLeft = this.maxJumps - 1;
+            } else {
+                this.jumpsLeft--;
+            }
+            
             this.velocityY = this.jumpForce;
             this.onGround = false;
-            this.isJumping = true;
+            this.coyoteTime = 0;
+            this.jumpCooldown = 4; // Add a small cooldown between jumps
+            
+            // Slightly reduce the power of subsequent jumps
+            if (this.jumpsLeft < this.maxJumps - 1) {
+                this.velocityY *= 0.8;
+            }
         }
     }
 
     update() {
+        // Handle jump cooldown
+        if (this.jumpCooldown > 0) {
+            this.jumpCooldown--;
+        }
+
+        // If we're on the ground but about to move, check if we should start coyote time
+        if (this.onGround && this.velocityY !== 0) {
+            this.onGround = false;
+            this.coyoteTime = 0;
+        }
+
+        // Update coyote time
+        if (!this.onGround && this.coyoteTime < this.maxCoyoteTime) {
+            this.coyoteTime++;
+        }
+
         // Apply gravity if not on ground
         if (!this.onGround) {
             this.velocityY += this.gravity;
+            // Apply terminal velocity for falling
+            this.velocityY = Math.min(this.velocityY, 20);
         }
 
         // Update position with boundary checks
@@ -50,6 +88,7 @@ class Player {
             this.x = nextX;
         }
 
+        // Update vertical position
         this.y = nextY;
 
         // Basic ground collision
@@ -57,61 +96,70 @@ class Player {
             this.y = window.gameEngine.canvas.height - this.height;
             this.velocityY = 0;
             this.onGround = true;
-            this.isJumping = false;  // Reset jump state when hitting ground
+            this.jumpsLeft = this.maxJumps;
+            this.coyoteTime = 0;
         }
 
-        // Apply terminal velocity for falling
-        if (!this.onGround) {
-            this.velocityY = Math.min(this.velocityY, 15); // Terminal velocity
-        } else {
-            // Reset vertical velocity when on ground
-            this.velocityY = 0;
+        // Reset jumps when properly on ground
+        if (this.onGround) {
+            this.jumpsLeft = this.maxJumps;
+            this.velocityY = 0; // Ensure we stop any downward movement
         }
-
-        // Debug information
-        console.log({
-            onGround: this.onGround,
-            isJumping: this.isJumping,
-            velocityY: this.velocityY,
-            y: this.y
-        });
     }
 
     checkPlatformCollision(platform) {
-        // Get the player's bounds after movement
+        // Get the player's bounds
+        const nextX = this.x + this.velocityX;
         const nextY = this.y + this.velocityY;
         const wasAbove = this.y + this.height <= platform.y;
-        
-        // Check for collision
-        const collision = (
-            this.x < platform.x + platform.width &&
-            this.x + this.width > platform.x &&
+        const wasBelow = this.y >= platform.y + platform.height;
+        const wasLeft = this.x + this.width <= platform.x;
+        const wasRight = this.x >= platform.x + platform.width;
+
+        // Projected position collision check
+        const willCollide = (
+            nextX < platform.x + platform.width &&
+            nextX + this.width > platform.x &&
             nextY < platform.y + platform.height &&
             nextY + this.height > platform.y
         );
 
-        if (collision) {
-            if (wasAbove && this.velocityY >= 0) {
-                // Landing on top of platform
+        if (!willCollide) {
+            // If we were standing on this platform and now we're not
+            if (wasAbove && this.onGround && 
+                this.x + this.width > platform.x && 
+                this.x < platform.x + platform.width) {
+                this.onGround = false;
+                this.coyoteTime = 0;
+            }
+            return false;
+        }
+
+        // Handle collisions based on approach direction
+        if (wasAbove) {
+            // Landing on top of platform
+            if (this.velocityY >= 0) {
                 this.y = platform.y - this.height;
                 this.velocityY = 0;
                 this.onGround = true;
-                this.isJumping = false;  // Reset jump state when landing
+                this.jumpsLeft = this.maxJumps;
+                this.coyoteTime = 0;
                 return true;
-            } else if (this.y > platform.y + platform.height) {
-                // Hitting platform from below
-                this.y = platform.y + platform.height;
-                this.velocityY = 0;
-            } else {
-                // Side collision
-                if (this.x < platform.x) {
-                    this.x = platform.x - this.width;
-                } else {
-                    this.x = platform.x + platform.width;
-                }
-                this.velocityX = 0;
             }
+        } else if (wasBelow) {
+            // Hitting from below
+            this.y = platform.y + platform.height;
+            this.velocityY = 0;
+        } else if (wasLeft) {
+            // Hitting from left
+            this.x = platform.x - this.width;
+            this.velocityX = 0;
+        } else if (wasRight) {
+            // Hitting from right
+            this.x = platform.x + platform.width;
+            this.velocityX = 0;
         }
+
         return false;
     }
 
