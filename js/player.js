@@ -9,8 +9,8 @@ class Player {
         this.speed = 5;
         this.jumpForce = -15;        // Stronger jump
         this.gravity = 0.7;          // Increased gravity for snappier feel
-        this.onGround = true;
-        this.health = 100;
+    this.onGround = true;
+    this.health = 3; // Use 3 hearts
         this.gold = 0;
         this.jumpsLeft = 2;          // Allow double jump
         this.maxJumps = 2;           // Maximum number of jumps allowed
@@ -156,13 +156,15 @@ class Player {
         const cameFromLeft = (prevX + this.width) <= platform.x;
         const cameFromRight = prevX >= platform.x + platform.width;
 
-        if (cameFromAbove && this.velocityY >= 0) {
-            // Landing on top
+        if (cameFromAbove) {
+            // Landing on top (use previous position check rather than velocity sign)
             this.y = platform.y - this.height;
             this.velocityY = 0;
             this.onGround = true;
             this.jumpsLeft = this.maxJumps;
             this.coyoteTime = 0;
+            // Freeze previous Y to the snapped position so next collision check treats us as standing
+            this.prevY = this.y;
             return true;
         }
 
@@ -192,6 +194,7 @@ class Player {
             this.onGround = true;
             this.jumpsLeft = this.maxJumps;
             this.coyoteTime = 0;
+            this.prevY = this.y;
             return true;
         }
 
@@ -244,10 +247,44 @@ class Player {
 
     takeDamage(amount) {
         this.health -= amount;
-        document.getElementById('health').textContent = `Health: ${this.health}`;
+        this.updateHeartsUI();
         if (this.health <= 0) {
-            this.die();
+            // Reset to beginning of current stage/level
+            if (window.gameEngine && window.gameEngine.levels) {
+                // Reset player position only
+                this.resetPositionToLevelStart();
+                // Restore full health for the retry
+                this.health = 3;
+                this.updateHeartsUI();
+            } else {
+                this.die();
+            }
         }
+    }
+
+    updateHeartsUI() {
+        const hearts = document.querySelectorAll('#health-hearts .heart');
+        // Hearts are stored left-to-right with data-index 2..0; hide rightmost first
+        for (const heart of hearts) {
+            const idx = parseInt(heart.getAttribute('data-index'), 10);
+            // Show heart if idx < health
+            if (idx < this.health) {
+                heart.classList.remove('hidden');
+            } else {
+                heart.classList.add('hidden');
+            }
+        }
+    }
+
+    resetPositionToLevelStart() {
+        // Move player to level start (x=50) and ground y
+        this.x = 50;
+        this.y = window.gameEngine.canvas.height - this.height;
+        this.velocityX = 0;
+        this.velocityY = 0;
+        this.onGround = true;
+        this.jumpsLeft = this.maxJumps;
+        this.coyoteTime = 0;
     }
 
     collectGold(amount) {
@@ -265,11 +302,10 @@ class Player {
         this.y = window.gameEngine.canvas.height - this.height;  // Use canvas height for proper positioning
         this.velocityX = 0;
         this.velocityY = 0;
-        this.health = 100;
+        this.health = 3;
         this.onGround = true;  // Reset ground state
         this.isJumping = false;  // Reset jumping state
-        this.hazardCooldown = 0;
-        document.getElementById('health').textContent = `Health: ${this.health}`;
+        this.updateHeartsUI();
     }
 
     draw(ctx) {

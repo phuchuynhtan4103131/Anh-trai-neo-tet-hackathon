@@ -43,8 +43,12 @@ class GameEngine {
         this.player = new Player(50, this.canvas.height - 60);  // Account for player height
         this.questions = new Questions();
         this.levels = new Levels(this.canvas.width, this.canvas.height);
-        this.currentLevel = this.levels.currentLevel;
-
+        // Ensure hearts UI reflects player's health
+        if (this.player && typeof this.player.updateHeartsUI === 'function') {
+            this.player.updateHeartsUI();
+        }
+        
+        // Setup event listeners
         this.setupEventListeners();
         this.gameLoop();
     }
@@ -67,9 +71,11 @@ class GameEngine {
     startGame() {
         this.gameState = 'playing';
         this.hideAllScreens();
-        this.canvas.classList.remove('hidden');
-        document.getElementById('game-ui')?.classList.remove('hidden');
-        document.getElementById('back-btn')?.classList.remove('hidden');
+        document.getElementById('game-area').classList.remove('hidden');
+        document.getElementById('game-ui').classList.remove('hidden');
+        document.getElementById('back-btn').classList.remove('hidden');
+        // Resize canvas after showing area
+        this.resizeCanvas();
     }
 
     showInstructions() {
@@ -101,7 +107,7 @@ class GameEngine {
         const screens = [
             'main-menu',
             'instructions-screen',
-            'gameCanvas',
+            'game-area',
             'game-ui',
             'back-btn'
         ];
