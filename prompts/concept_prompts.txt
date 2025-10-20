@@ -12,3 +12,36 @@ Game Mechanics:
 
 Level Design Philosophy:
 "Help me design a level progression system that gradually introduces more complex environmental and social concepts while increasing gameplay difficulty."
+
+Educational Integration:
+"How can we seamlessly integrate environmental education into the platformer mechanics? Design quiz interactions that feel natural within gameplay."
+
+Player Motivation:
+"Create a reward system that encourages both learning and skilled gameplay. Consider:
+- Score mechanics for correct answers
+- Bonus points for environmental awareness
+- Checkpoints as progress markers
+- Health system that promotes careful play"
+
+Cross-Cultural Elements:
+"Incorporate cultural elements from both Australia and Vietnam:
+- Environmental challenges specific to each region
+- Social issues affecting both countries
+- Shared environmental concerns
+- Cultural symbols and references"
+
+Learning Objectives:
+"Define specific educational goals for each level:
+- Climate change awareness
+- Social responsibility
+- Community development
+- Environmental protection
+- Cultural understanding"
+
+Game Flow:
+"Design the progression of gameplay elements:
+- Tutorial introduction
+- Gradual mechanics introduction
+- Increasing challenge complexity
+- Knowledge building through levels
+- Meaningful endgame"

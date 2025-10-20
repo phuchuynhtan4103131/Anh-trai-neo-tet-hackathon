@@ -37,3 +37,72 @@
 - Score persistence
 - Question tracking
 - Checkpoint system"
+
+# Player Physics Refinement
+"Implement advanced player movement:
+- Variable jump height based on button hold duration
+- Coyote time window for jump forgiveness
+- Wall bounce and hazard knockback effects
+- Smooth acceleration and deceleration
+- Air control and momentum
+- Edge detection and handling"
+
+# Question System Enhancement
+"Develop robust question handling:
+- Dynamic question loading and display
+- Answer validation and scoring
+- Progress tracking across levels
+- Reward distribution system
+- Visual feedback animations
+- Answer history tracking
+- Modal interaction handling"
+
+# Level Transition Logic
+"Create seamless level transitions:
+- State preservation between levels
+- Checkpoint management
+- Player spawn handling
+- Score and health persistence
+- Progress saving
+- Level unlock conditions
+- Transition animations"
+
+# Canvas Rendering Optimization
+"Optimize game rendering:
+- Efficient sprite handling
+- Background parallax effects
+- Particle systems for effects
+- UI layer management
+- Screen shake effects
+- Smooth camera follow
+- Visual feedback systems"
+
+# Local Storage Implementation
+"Implement data persistence:
+- High score saving
+- Game state management
+- Player progress tracking
+- Settings persistence
+- Question history
+- Achievement tracking
+- Auto-save functionality"
+
+# Input System
+"Create responsive controls:
+- Keyboard input handling
+- Touch input support
+- Input buffering
+- Custom key bindings
+- Control customization
+- Input state management
+- Multi-input handling"
+
+# Collision System Enhancement
+"Refine collision detection:
+- Platform edge handling
+- One-way platform logic
+- Hazard interaction
+- Question block activation
+- Checkpoint triggering
+- Moving platform support
+- Corner case handling"

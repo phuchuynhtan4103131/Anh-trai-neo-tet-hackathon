@@ -1,23 +1,98 @@
-Player Movement System:
-"Implement smooth platformer physics with variable jump heights, coyote time, and precise collision detection."
+Player Physics Implementation:
+"Implement a robust platformer physics system with:
+- Variable jump heights based on button hold
+- Coyote time for jump forgiveness
+- Ground detection and friction
+- Air control and momentum
+- Multiple jump capability
+- Smooth acceleration and deceleration"
 
-Question System:
-"Create a system for displaying and handling multiple-choice environmental questions when players hit question blocks."
+Question System Architecture:
+"Create an interactive question system featuring:
+- Dynamic question loading
+- Multiple choice handling
+- Answer validation
+- Score tracking
+- Progress persistence
+- Visual feedback
+- Reward distribution"
 
-Level Management:
-"Implement a level management system that handles level progression, checkpoints, and player spawning."
+Level Management System:
+"Design a comprehensive level system with:
+- Dynamic level loading
+- Checkpoint management
+- Progress tracking
+- Difficulty scaling
+- State persistence
+- Transition effects
+- Player spawning logic"
 
 Game Engine Core:
-"Design a game engine class that manages game state, rendering, and updates for all game objects."
+"Implement core engine features:
+- Game loop management
+- State machine
+- Event handling
+- Resource management
+- Collision detection
+- Input processing
+- Scene management"
 
-Collision System:
-"Implement precise collision detection for platforms, hazards, and interactive elements."
+Collision Detection:
+"Create precise collision handling for:
+- Platform interactions
+- Hazard detection
+- Question block activation
+- Checkpoint triggering
+- Edge detection
+- Moving platforms
+- One-way platforms"
 
-Score System:
-"Add a scoring system that rewards correct answers and reaching checkpoints while penalizing hazard hits."
+Health and Lives System:
+"Implement a health management system with:
+- Three total lives
+- Damage handling
+- Death animation
+- Position reset
+- Level restart
+- Health persistence
+- Visual feedback"
+
+Score Management:
+"Create a comprehensive scoring system:
+- Point allocation (+100 for correct answers)
+- Checkpoint bonuses (+20)
+- Hazard penalties (-20)
+- High score tracking
+- Score persistence
+- Visual display
+- End game summary"
 
 Animation Engine:
-"Create an animation system for the player character that handles multiple states and smooth transitions."
+"Develop a flexible animation system for:
+- Player states (idle, run, jump)
+- Death sequence
+- Damage feedback
+- Question interactions
+- Checkpoint activation
+- Level transitions
+- UI elements"
 
 Save System:
-"Implement a system to save and load the player's progress and best scores using localStorage."
+"Implement data persistence using localStorage:
+- High scores
+- Level progress
+- Player stats
+- Settings
+- Achievements
+- Question history
+- Game state"
+
+Game State Management:
+"Create a robust state system handling:
+- Menu navigation
+- Level transitions
+- Game pausing
+- Death sequence
+- Question modal
+- Score updates
+- Player respawning"
