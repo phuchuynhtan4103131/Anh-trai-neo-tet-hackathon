@@ -87,19 +87,19 @@ class GameEngine {
     handleKeyDown(e) {
         if (this.gameState !== 'playing') return;
         
-        switch(e.key) {
-            case 'a':
+        switch (e.code) {
             case 'ArrowLeft':
+            case 'KeyA':
                 this.player.moveLeft();
                 break;
-            case 'd':
             case 'ArrowRight':
+            case 'KeyD':
                 this.player.moveRight();
                 break;
-            case ' ': // Space bar
+            case 'Space':
             case 'ArrowUp':
-            case 'w':
-                e.preventDefault(); // Prevent page scrolling
+            case 'KeyW':
+                e.preventDefault(); // Prevent page scrolling or button activation
                 this.player.jump();
                 break;
         }
@@ -108,9 +108,11 @@ class GameEngine {
     handleKeyUp(e) {
         if (this.gameState !== 'playing') return;
         
-        switch(e.key) {
+        switch (e.code) {
             case 'ArrowLeft':
             case 'ArrowRight':
+            case 'KeyA':
+            case 'KeyD':
                 this.player.stopMoving();
                 break;
         }
@@ -119,19 +121,19 @@ class GameEngine {
     checkCollisions() {
         // Check collisions with platforms
         const currentLevel = this.levels.getCurrentLevel();
-        
-        // Reset ground state at the start of each update
-        if (!this.player.onGround) {
-            this.player.canJump = false;
-        }
-        this.player.onGround = false;
-        
+        const groundThreshold = this.canvas.height - this.player.height - 0.5;
+        let isGrounded = this.player.y >= groundThreshold;
+
         // Check platform collisions
         for (const platform of currentLevel.platforms) {
             if (this.player.checkPlatformCollision(platform)) {
-                this.player.onGround = true;
-                this.player.canJump = true;
+                isGrounded = true;
             }
+        }
+
+        this.player.onGround = isGrounded;
+        if (isGrounded) {
+            this.player.isJumping = false;
         }
 
         // Check collisions with question blocks
